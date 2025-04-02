@@ -41,6 +41,8 @@ const Login = ({ onLogin }) => {
           navigate('/mesero');
         } else if (userData.role === 'cocina') {
           navigate('/cocinero');
+        } else if (userData.role === 'admin') {
+          navigate('/admin');
         }
       } else {
         setError('Usuario, contraseña o rol incorrectos');
