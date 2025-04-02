@@ -1,0 +1,142 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Evita scroll no deseado */
+  font-family: 'Arial', sans-serif;
+}
+
+.login-wrapper {
+  display: flex;
+  position: fixed; /* Hace que el contenedor sea estático */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.login-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-image {
+  flex: 1;
+  background-image: url('src/assets/94908887838ee9a32701a95a3fd7a4ce_hamburguesa-rellena-de-queso-y-tocineta-recetas-nestle-venezuela-ma.webp');
+  background-size: cover;
+  background-position: center;
+  display: none; /* Oculto por defecto en pantallas pequeñas */
+  width: 40%;
+  height: 100%;
+}
+
+.login-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-color: white;
+  max-width: 600px; /* Aumentado el ancho */
+  max-height: 600px;
+  width: 100%;
+  height: 70%; /* Ajustado el tamaño */
+  overflow-y: auto;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2em;
+}
+
+.login-header h1 {
+  font-size: 2.2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.login-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 500px; /* Ajustado el ancho */
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.9rem; /* Un poco más grande */
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1.1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #4a90e2;
+  outline: none;
+}
+
+.login-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.login-button:hover {
+  background-color: #3a7bc8;
+}
+
+/* Estilos para pantallas grandes */
+@media (min-width: 768px) {
+  .login-image {
+    display: block;
+  }
+  
+  .login-content {
+    padding: 3rem;
+    max-width: 600px; /* Aumento del ancho */
+  }
+}
+
+/* Estilos específicos para tablets */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .login-content {
+    justify-content: flex-start;
+    padding-top: 5rem;
+  }
+}
