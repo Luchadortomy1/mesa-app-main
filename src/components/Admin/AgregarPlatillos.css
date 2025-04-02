@@ -4,6 +4,7 @@
     margin-top: 10px;
     border-radius: 5px;
 }
+
 .platillo-form {
     display: flex;
     flex-direction: column;
@@ -14,9 +15,11 @@
     padding: 20px;
     border-radius: 10px;
 }
-.titulo{
+
+.titulo {
     text-align: center;
 }
+
 .boton-container {
     display: flex;
     justify-content: center;
@@ -36,4 +39,52 @@
 
 .boton-agregar:hover {
     background-color: #0056b3;
+}
+
+.platillos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 80%;
+    margin: 0 auto;
+    background: #383838;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.platillos-lista ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.platillos-lista li {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    background-color: #383838;
+}
+
+.platillos-lista li h3 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.platillos-lista li p {
+    margin: 5px 0;
+}
+
+.platillos-lista li .descripcion {
+    word-wrap: break-word; /* Permite que el texto largo se ajuste dentro del contenedor */
+    overflow-wrap: break-word; /* Asegura que las palabras largas no se salgan */
+    white-space: pre-wrap; /* Permite el salto de línea automático */
+    max-height: 150px; /* Limita la altura máxima de la descripción */
+    overflow-y: auto; /* Agrega desplazamiento si el contenido excede la altura */
+    font-size: 0.9em; /* Reduce el tamaño de la fuente para la descripción */
+}
+
+.platillos-lista li .descripcion p {
+    margin: 5px 0;
 }
