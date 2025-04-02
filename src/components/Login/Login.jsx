@@ -1,23 +1,51 @@
-// src/components/Login/Login.jsx
 import React, { useState } from 'react';
 import './Login.css';
+import app from '../../Firebaseconfig'; // Asegúrate de que la ruta sea correcta
+import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore';
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
+
+const db = getFirestore(app);
 
 const Login = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     role: 'mesero'
   });
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin(formData);
+    setError('');
+    
+    try {
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('username', '==', formData.username), where('password', '==', formData.password));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        onLogin(formData);
+        console.log('Usuario autenticado:', formData.username);
+        // Guardar el token en una cookie
+        Cookies.set('token', JSON.stringify(formData), { expires: 1 });
+        // Redirigir a la página de mesero
+        navigate('/mesero');
+      } else {
+        setError('Usuario o contraseña incorrectos');
+      }
+    } catch (err) {
+      console.error('Error verificando usuario:', err);
+      setError('Error al iniciar sesión');
+    }
+
+    
   };
 
   return (
     <div className="login-wrapper">
       <div className="login-container">
-        {/* Div para la imagen (solo visible en desktop) */}
         <div className="login-image"></div>
         
         <div className="login-content">
@@ -63,7 +91,9 @@ const Login = ({ onLogin }) => {
               </select>
             </div>
 
-            <button type="submit" className="login-button">
+            {error && <p className="error-message">{error}</p>}
+
+            <button type="submit" className="login-button"> 
               Iniciar Sesión
             </button>
           </form>

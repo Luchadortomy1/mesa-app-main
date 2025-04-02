@@ -140,7 +140,7 @@ const PanelMesero = ({ usuario }) => {
           <div className="stat-card">
             <h4>Mesas Activas</h4>
             <p>{mesas.length}</p>
-          </div>
+          </div><br />
           <div className="stat-card">
             <h4>Por Cobrar</h4>
             <p>{mesas.filter(m => m.estado === 'activa').length}</p>
