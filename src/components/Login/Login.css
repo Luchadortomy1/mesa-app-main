@@ -46,7 +46,7 @@ html, body {
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  background-color: white;
+  background-color: #f5f5f5;
   max-width: 600px; /* Aumentado el ancho */
   max-height: 600px;
   width: 100%;
