@@ -25,8 +25,7 @@ const Login = ({ onLogin }) => {
       const q = query(
         usersRef, 
         where('username', '==', formData.username), 
-        where('password', '==', formData.password),
-        where('role', '==', formData.role) // Asegura que el rol también coincida
+        where('password', '==', formData.password)
       );
       const querySnapshot = await getDocs(q);
 
@@ -86,18 +85,6 @@ const Login = ({ onLogin }) => {
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
                 required
               />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="role">Rol</label>
-              <select
-                id="role"
-                value={formData.role}
-                onChange={(e) => setFormData({...formData, role: e.target.value})}
-              >
-                <option value="mesero">Mesero</option>
-                <option value="cocina">Cocina</option>
-              </select>
             </div>
 
             {error && <p className="error-message">{error}</p>}
