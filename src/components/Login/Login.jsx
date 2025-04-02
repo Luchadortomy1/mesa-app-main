@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Login.css';
-import app from '../../Firebaseconfig'; // Asegúrate de que la ruta sea correcta
+import app from '../../Firebaseconfig';
 import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
@@ -19,28 +19,37 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     try {
       const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('username', '==', formData.username), where('password', '==', formData.password));
+      const q = query(
+        usersRef, 
+        where('username', '==', formData.username), 
+        where('password', '==', formData.password),
+        where('role', '==', formData.role) // Asegura que el rol también coincida
+      );
       const querySnapshot = await getDocs(q);
-      
+
       if (!querySnapshot.empty) {
-        onLogin(formData);
-        console.log('Usuario autenticado:', formData.username);
-        // Guardar el token en una cookie
-        Cookies.set('token', JSON.stringify(formData), { expires: 1 });
-        // Redirigir a la página de mesero
-        navigate('/mesero');
+        const userData = querySnapshot.docs[0].data(); // Obtener los datos exactos del usuario en BD
+        onLogin(userData); // Pasar datos reales, no formData
+
+        console.log('Usuario autenticado:', userData.username);
+        Cookies.set('token', JSON.stringify(userData), { expires: 1 });
+
+        // Redirección basada en el rol real
+        if (userData.role === 'mesero') {
+          navigate('/mesero');
+        } else if (userData.role === 'cocina') {
+          navigate('/cocinero');
+        }
       } else {
-        setError('Usuario o contraseña incorrectos');
+        setError('Usuario, contraseña o rol incorrectos');
       }
     } catch (err) {
       console.error('Error verificando usuario:', err);
       setError('Error al iniciar sesión');
     }
-
-    
   };
 
   return (
