@@ -1,28 +1,68 @@
-// src/components/Mesero/PanelMesero.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './PanelMesero.css';
-import { useOrdenes } from '../../context/OrdenesContext';
+import { 
+  getFirestore, 
+  collection, 
+  getDocs, 
+  addDoc, 
+  serverTimestamp, 
+  query, 
+  where, 
+  updateDoc, 
+  doc 
+} from 'firebase/firestore';
+import app from '../../firebaseConfig';
 
-const menuItems = [
-  { id: 1, nombre: 'Hamburguesa', precio: 120, categoria: 'Platos Principales' },
-  { id: 2, nombre: 'Pizza', precio: 150, categoria: 'Platos Principales' },
-  { id: 3, nombre: 'Ensalada César', precio: 90, categoria: 'Ensaladas' },
-  { id: 4, nombre: 'Papas Fritas', precio: 60, categoria: 'Acompañamientos' },
-  { id: 5, nombre: 'Refresco', precio: 30, categoria: 'Bebidas' },
-  { id: 6, nombre: 'Cerveza', precio: 45, categoria: 'Bebidas' },
-];
-
-const PanelMesero = ({ usuario }) => {
-  const { agregarOrden } = useOrdenes();
+const PanelMesero = () => {
+  const db = getFirestore(app);
   const [mesas, setMesas] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [mesaSeleccionada, setMesaSeleccionada] = useState(null);
   const [nuevaMesa, setNuevaMesa] = useState({
     nombreCliente: '',
-    numeroComensales: 1,
-    pedidos: []
+    numeroComensales: 1
   });
   const [pedidoActual, setPedidoActual] = useState({});
+  const [menuItems, setMenuItems] = useState([]);
+  const [loadingMenu, setLoadingMenu] = useState(true);
+
+  // Cargar menú desde Firestore
+  useEffect(() => {
+    const cargarMenu = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'platillos'));
+        const items = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          categoria: doc.data().categoria || 'Otros'
+        }));
+        setMenuItems(items);
+        setLoadingMenu(false);
+      } catch (error) {
+        console.error("Error al cargar el menú:", error);
+        setLoadingMenu(false);
+      }
+    };
+    cargarMenu();
+  }, [db]);
+
+  // Cargar mesas activas desde Firestore
+  useEffect(() => {
+    const cargarMesas = async () => {
+      try {
+        const q = query(collection(db, 'mesas'), where('estado', '==', 'activa'));
+        const querySnapshot = await getDocs(q);
+        const mesasData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setMesas(mesasData);
+      } catch (error) {
+        console.error("Error al cargar mesas:", error);
+      }
+    };
+    cargarMesas();
+  }, [db]);
 
   const agregarMesa = () => {
     setMesaSeleccionada(null);
@@ -30,75 +70,112 @@ const PanelMesero = ({ usuario }) => {
     setPedidoActual({});
   };
 
-  const handleSubmitMesa = (e) => {
-    e.preventDefault();
-
-    if (mesaSeleccionada) {
-      // Actualizar mesa existente
-      const mesaActualizada = {
-        ...mesaSeleccionada,
-        pedidos: [...mesaSeleccionada.pedidos, ...Object.values(pedidoActual)],
-        total: calcularTotal([...mesaSeleccionada.pedidos, ...Object.values(pedidoActual)])
-      };
-
-      setMesas(mesas.map(m => m.id === mesaSeleccionada.id ? mesaActualizada : m));
-
-      // Enviar nuevo pedido a cocina
-      agregarOrden({
-        numeroMesa: mesaSeleccionada.numero,
-        nombreCliente: mesaSeleccionada.cliente,
-        items: Object.values(pedidoActual).map(item => ({
-          ...item,
-          estado: 'pendiente'
-        }))
-      });
-    } else {
-      // Crear nueva mesa
-      const mesaNueva = {
-        id: Date.now(),
-        numero: mesas.length + 1,
-        cliente: nuevaMesa.nombreCliente,
-        comensales: nuevaMesa.numeroComensales,
-        pedidos: Object.values(pedidoActual),
-        estado: 'activa',
-        total: calcularTotal(Object.values(pedidoActual))
-      };
-
-      setMesas([...mesas, mesaNueva]);
-
-      // Enviar orden inicial a cocina
-      agregarOrden({
-        numeroMesa: mesaNueva.numero,
-        nombreCliente: mesaNueva.cliente,
-        items: Object.values(pedidoActual).map(item => ({
-          ...item,
-          estado: 'pendiente'
-        }))
-      });
-    }
-
-    // Limpiar formulario
-    setShowModal(false);
-    setNuevaMesa({ nombreCliente: '', numeroComensales: 1, pedidos: [] });
-    setPedidoActual({});
-    setMesaSeleccionada(null);
-  };
-
   const calcularTotal = (pedidos) => {
     return pedidos.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+  };
+
+  const guardarPedido = async (mesaData) => {
+    try {
+      const itemsArray = Object.values(pedidoActual);
+      
+      if (itemsArray.length === 0) {
+        throw new Error("No hay items en el pedido");
+      }
+
+      // Validar y asegurar datos requeridos
+      const numeroMesa = mesaData?.numero || (mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1);
+      const nombreCliente = mesaData?.cliente || nuevaMesa.nombreCliente || 'Cliente no especificado';
+
+      // Preparar datos del pedido con valores por defecto
+      const pedidoData = {
+        numeroMesa: numeroMesa,
+        nombreCliente: nombreCliente,
+        items: itemsArray.map(item => ({
+          id: item.id || Date.now().toString(),
+          nombre: item.nombre || 'Producto sin nombre',
+          precio: item.precio || 0,
+          cantidad: item.cantidad || 1,
+          estado: 'pendiente'
+        })),
+        total: calcularTotal(itemsArray),
+        estado: 'pendiente',
+        fecha: serverTimestamp()
+      };
+
+      // Guardar pedido en Firestore
+      await addDoc(collection(db, 'pedidos'), pedidoData);
+
+      // Actualizar o crear mesa
+      if (mesaSeleccionada) {
+        await updateDoc(doc(db, 'mesas', mesaSeleccionada.id), {
+          pedidos: [...mesaSeleccionada.pedidos, ...itemsArray],
+          total: calcularTotal([...mesaSeleccionada.pedidos, ...itemsArray]),
+          estado: 'activa'
+        });
+      } else {
+        await addDoc(collection(db, 'mesas'), {
+          numero: numeroMesa,
+          cliente: nombreCliente,
+          comensales: nuevaMesa.numeroComensales || 1,
+          pedidos: itemsArray,
+          total: calcularTotal(itemsArray),
+          estado: 'activa',
+          fechaCreacion: serverTimestamp()
+        });
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error al guardar pedido:", error);
+      alert(`Error al guardar: ${error.message}`);
+      return false;
+    }
+  };
+
+  const handleSubmitMesa = async (e) => {
+    e.preventDefault();
+    
+    if (Object.keys(pedidoActual).length === 0) {
+      alert("Debes agregar al menos un platillo");
+      return;
+    }
+
+    const success = await guardarPedido(mesaSeleccionada || {
+      numero: mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1,
+      cliente: nuevaMesa.nombreCliente
+    });
+
+    if (success) {
+      setShowModal(false);
+      setNuevaMesa({ nombreCliente: '', numeroComensales: 1 });
+      setPedidoActual({});
+      setMesaSeleccionada(null);
+      
+      // Recargar mesas
+      const q = query(collection(db, 'mesas'), where('estado', '==', 'activa'));
+      const querySnapshot = await getDocs(q);
+      setMesas(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }
   };
 
   const actualizarCantidad = (itemId, cantidad) => {
     if (cantidad < 0) return;
 
     const item = menuItems.find(i => i.id === itemId);
+    if (!item) return;
+
     if (cantidad === 0) {
       const { [itemId]: _, ...resto } = pedidoActual;
       setPedidoActual(resto);
     } else {
       setPedidoActual({
         ...pedidoActual,
-        [itemId]: { ...item, cantidad }
+        [itemId]: { 
+          ...item, 
+          cantidad,
+          precio: item.precio || 0,
+          nombre: item.nombre || 'Producto sin nombre'
+        }
       });
     }
   };
@@ -109,23 +186,30 @@ const PanelMesero = ({ usuario }) => {
     setPedidoActual({});
   };
 
-  const generarCuenta = (mesa) => {
-    const cuenta = {
-      mesa: mesa.numero,
-      cliente: mesa.cliente,
-      items: mesa.pedidos,
-      total: mesa.total,
-      fecha: new Date().toLocaleString()
-    };
-
-    // Aquí podrías implementar la impresión o envío de la cuenta
-    console.log('Cuenta generada:', cuenta);
-
-    // Actualizar estado de la mesa
-    setMesas(mesas.map(m =>
-      m.id === mesa.id ? { ...m, estado: 'completada' } : m
-    ));
+  const generarCuenta = async (mesa) => {
+    try {
+      await updateDoc(doc(db, 'mesas', mesa.id), {
+        estado: 'completada',
+        fechaCierre: serverTimestamp()
+      });
+      setMesas(mesas.map(m => m.id === mesa.id ? { ...m, estado: 'completada' } : m));
+    } catch (error) {
+      console.error("Error al generar cuenta:", error);
+    }
   };
+
+  const agruparPorCategoria = (items) => {
+    return items.reduce((acc, item) => {
+      const categoria = item.categoria || 'Otros';
+      if (!acc[categoria]) acc[categoria] = [];
+      acc[categoria].push(item);
+      return acc;
+    }, {});
+  };
+
+  if (loadingMenu) {
+    return <div className="panel-mesero">Cargando menú...</div>;
+  }
 
   return (
     <div className="panel-mesero">
@@ -140,54 +224,55 @@ const PanelMesero = ({ usuario }) => {
           <div className="stat-card">
             <h4>Mesas Activas</h4>
             <p>{mesas.length}</p>
-          </div><br />
+          </div>
           <div className="stat-card">
             <h4>Por Cobrar</h4>
             <p>{mesas.filter(m => m.estado === 'activa').length}</p>
           </div>
         </div>
 
-       
         <section className="mesas-container">
-        {/* Salto de línea vacío */}
-          <br />
-  <h3>Mis Mesas</h3>
+          <h3>Mis Mesas</h3>
+          <div className="mesas-grid">
+            <button className="btn-agregar" onClick={agregarMesa}>
+              <span className="btn-icon">+</span>
+            </button>
 
-  <div className="mesas-grid">
-    {/* Botón fijo en la primera celda */}
-    <button className="btn-agregar" onClick={agregarMesa}>
-      <span className="btn-icon">+</span>
-    </button>
-
-    {/* Renderizar mesas */}
-    {mesas.map((mesa, index) => (
-      <div key={mesa.id} className="mesa-card">
-        <div className="mesa-header">
-          <h4>Mesa {mesa.numero}</h4>
-          <span className={`estado ${mesa.estado}`}>
-            {mesa.estado}
-          </span>
-        </div>
-        <div className="mesa-info">
-          <p>Cliente: {mesa.cliente}</p>
-          <p>Comensales: {mesa.comensales}</p>
-          <p>Total: ${mesa.total}</p>
-        </div>
-        <div className="mesa-actions">
-          <button className="btn-menu" onClick={() => agregarPedidoAMesa(mesa)} disabled={mesa.estado === 'completada'}>
-            <span className="icon">📋</span>
-            <span>Menú</span>
-          </button>
-          <button className="btn-cuenta" onClick={() => generarCuenta(mesa)} disabled={mesa.estado === 'completada'}>
-            <span className="icon">💰</span>
-            <span>Cuenta</span>
-          </button>
-        </div>
-      </div>
-    ))}
-  </div>
-</section>
-
+            {mesas.map((mesa) => (
+              <div key={mesa.id} className="mesa-card">
+                <div className="mesa-header">
+                  <h4>Mesa {mesa.numero}</h4>
+                  <span className={`estado ${mesa.estado}`}>
+                    {mesa.estado}
+                  </span>
+                </div>
+                <div className="mesa-info">
+                  <p>Cliente: {mesa.cliente}</p>
+                  <p>Comensales: {mesa.comensales}</p>
+                  <p>Total: ${mesa.total}</p>
+                </div>
+                <div className="mesa-actions">
+                  <button 
+                    className="btn-menu" 
+                    onClick={() => agregarPedidoAMesa(mesa)} 
+                    disabled={mesa.estado === 'completada'}
+                  >
+                    <span className="icon">📋</span>
+                    <span>Menú</span>
+                  </button>
+                  <button 
+                    className="btn-cuenta" 
+                    onClick={() => generarCuenta(mesa)} 
+                    disabled={mesa.estado === 'completada'}
+                  >
+                    <span className="icon">💰</span>
+                    <span>Cuenta</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
 
       {showModal && (
@@ -212,7 +297,7 @@ const PanelMesero = ({ usuario }) => {
                       type="number"
                       min="1"
                       value={nuevaMesa.numeroComensales}
-                      onChange={(e) => setNuevaMesa({ ...nuevaMesa, numeroComensales: parseInt(e.target.value) })}
+                      onChange={(e) => setNuevaMesa({ ...nuevaMesa, numeroComensales: parseInt(e.target.value) || 1 })}
                       required
                     />
                   </div>
@@ -221,7 +306,7 @@ const PanelMesero = ({ usuario }) => {
 
               <div className="menu-section">
                 <h3>Menú</h3>
-                {Object.entries(Object.groupBy(menuItems, item => item.categoria)).map(([categoria, items]) => (
+                {Object.entries(agruparPorCategoria(menuItems)).map(([categoria, items]) => (
                   <div key={categoria} className="categoria-menu">
                     <h4>{categoria}</h4>
                     <div className="items-grid">

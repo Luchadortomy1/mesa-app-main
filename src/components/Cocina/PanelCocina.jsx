@@ -1,58 +1,81 @@
-// src/components/Cocina/PanelCocina.jsx
-import React from 'react';
-import { useOrdenes } from '../../context/OrdenesContext';
+import React, { useState, useEffect } from 'react';
+import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc } from 'firebase/firestore';
+import app from '../../firebaseConfig';
 import './PanelCocina.css';
 
 const PanelCocina = ({ usuario }) => {
-  const { ordenes, actualizarOrden, completarOrden } = useOrdenes();
+  const db = getFirestore(app);
+  const [ordenes, setOrdenes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Cargar órdenes desde Firestore
+  useEffect(() => {
+    const q = query(collection(db, 'pedidos'), where('estado', '!=', 'entregado'));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const ordenesData = [];
+      querySnapshot.forEach((doc) => {
+        ordenesData.push({
+          id: doc.id,
+          ...doc.data(),
+          tiempo: doc.data().fecha?.toDate() || new Date()
+        });
+      });
+      setOrdenes(ordenesData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [db]);
+
+  const actualizarEstadoItem = async (ordenId, itemId, nuevoEstado) => {
+    try {
+      const ordenRef = doc(db, 'pedidos', ordenId);
+      const orden = ordenes.find(o => o.id === ordenId);
+      
+      if (!orden) return;
+
+      const nuevosItems = orden.items.map(item => {
+        if (item.id === itemId) {
+          return { ...item, estado: nuevoEstado };
+        }
+        return item;
+      });
+
+      const todosCompletados = nuevosItems.every(item => item.estado === "completado");
+      const nuevoEstadoOrden = todosCompletados ? "completado" : "en_proceso";
+
+      await updateDoc(ordenRef, {
+        items: nuevosItems,
+        estado: nuevoEstadoOrden
+      });
+    } catch (error) {
+      console.error("Error al actualizar estado:", error);
+    }
+  };
+
+  const completarOrden = async (ordenId) => {
+    try {
+      const ordenRef = doc(db, 'pedidos', ordenId);
+      await updateDoc(ordenRef, {
+        estado: 'entregado',
+        fechaEntrega: new Date()
+      });
+    } catch (error) {
+      console.error("Error al completar orden:", error);
+    }
+  };
 
   const calcularEstadisticas = () => {
     return {
       pendientes: ordenes.filter(orden => 
-        orden.items.some(item => item.estado === "pendiente")).length,
+        orden.estado === "pendiente").length,
       enProceso: ordenes.filter(orden => 
-        orden.items.some(item => item.estado === "en_proceso") && 
-        !orden.items.every(item => item.estado === "completado")).length,
+        orden.estado === "en_proceso").length,
       completados: ordenes.filter(orden => 
-        orden.items.every(item => item.estado === "completado")).length
+        orden.estado === "completado").length
     };
   };
-
-  const actualizarEstadoItem = (ordenId, itemId, nuevoEstado) => {
-    const orden = ordenes.find(o => o.id === ordenId);
-    if (!orden) return;
-
-    const nuevosItems = orden.items.map(item => {
-      if (item.id === itemId) {
-        return { ...item, estado: nuevoEstado };
-      }
-      return item;
-    });
-
-    const todosCompletados = nuevosItems.every(item => item.estado === "completado");
-    const algunPendiente = nuevosItems.some(item => item.estado === "pendiente");
-    const nuevoEstadoOrden = todosCompletados ? "completado" : algunPendiente ? "pendiente" : "en_proceso";
-
-    actualizarOrden(ordenId, {
-      ...orden,
-      items: nuevosItems,
-      estado: nuevoEstadoOrden
-    });
-  };
-
-  const handleCompletarOrden = (ordenId) => {
-    const orden = ordenes.find(o => o.id === ordenId);
-    if (!orden) return;
-
-    if (!orden.items.every(item => item.estado === "completado")) {
-      alert("Todos los items deben estar completados para finalizar la orden");
-      return;
-    }
-
-    completarOrden(ordenId);
-  };
-
-  const estadisticas = calcularEstadisticas();
 
   const getPrioridadClase = (tiempo) => {
     const tiempoTranscurrido = Date.now() - new Date(tiempo).getTime();
@@ -62,6 +85,10 @@ const PanelCocina = ({ usuario }) => {
     if (minutos > 15) return "media";
     return "baja";
   };
+
+  if (loading) {
+    return <div className="panel-cocina">Cargando órdenes...</div>;
+  }
 
   return (
     <div className="panel-cocina">
@@ -76,15 +103,15 @@ const PanelCocina = ({ usuario }) => {
         <div className="dashboard-stats">
           <div className="stat-item">
             <span className="stat-label">Pendientes</span>
-            <span className="stat-value">{estadisticas.pendientes}</span>
+            <span className="stat-value">{calcularEstadisticas().pendientes}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">En Proceso</span>
-            <span className="stat-value">{estadisticas.enProceso}</span>
+            <span className="stat-value">{calcularEstadisticas().enProceso}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">Completados</span>
-            <span className="stat-value">{estadisticas.completados}</span>
+            <span className="stat-value">{calcularEstadisticas().completados}</span>
           </div>
         </div>
       </header>
@@ -97,14 +124,14 @@ const PanelCocina = ({ usuario }) => {
           >
             <div className="orden-header">
               <div className="orden-titulo">
-                <h3>{orden.mesa}</h3>
+                <h3>Mesa {orden.numeroMesa}</h3>
                 <div className="orden-detalles">
-                  <span className="tiempo">{new Date(orden.tiempo).toLocaleTimeString()}</span>
+                  <span className="tiempo">{orden.tiempo.toLocaleTimeString()}</span>
                   <span className="cliente">Cliente: {orden.nombreCliente}</span>
                 </div>
               </div>
               <span className={`estado-badge ${orden.estado}`}>
-                {orden.estado}
+                {orden.estado.replace('_', ' ')}
               </span>
             </div>
             
@@ -137,10 +164,10 @@ const PanelCocina = ({ usuario }) => {
             <div className="orden-footer">
               <button 
                 className={`btn-completar-orden ${orden.estado === "completado" ? "disponible" : ""}`}
-                onClick={() => handleCompletarOrden(orden.id)}
+                onClick={() => completarOrden(orden.id)}
                 disabled={orden.estado !== "completado"}
               >
-                Completar Orden
+                Marcar como Entregado
               </button>
             </div>
           </div>
