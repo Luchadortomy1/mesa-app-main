@@ -1,8 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import Cookies from 'js-cookie'
-import '../index.css'
-import '../App.css'
+import './Navbar.css'
 
 const Navbar = () => {
   return (

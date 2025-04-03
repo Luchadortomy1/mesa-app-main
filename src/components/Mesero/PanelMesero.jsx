@@ -220,12 +220,12 @@ const PanelMesero = () => {
       </header>
 
       <div className="dashboard">
-        <div className="stats-container">
+        <div className="stats-bar">
           <div className="stat-card">
             <h4>Mesas Activas</h4>
             <p>{mesas.length}</p>
           </div>
-          <div className="stat-card">
+          <div className="stat-item">
             <h4>Por Cobrar</h4>
             <p>{mesas.filter(m => m.estado === 'activa').length}</p>
           </div>
