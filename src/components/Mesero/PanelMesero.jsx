@@ -149,6 +149,8 @@ const PanelMesero = ({ usuario }) => {
 
        
         <section className="mesas-container">
+        {/* Salto de línea vacío */}
+          <br />
   <h3>Mis Mesas</h3>
 
   <div className="mesas-grid">

@@ -97,7 +97,7 @@ const AgregarPedidoModal = ({ isOpen, onClose, onSubmit }) => {
                       <div className="item-actions">
                         <input
                           type="number"
-                          min="0"
+                          min=" 0 "
                           value={itemsCantidad[item.id] || 0}
                           onChange={(e) => setItemsCantidad({
                             ...itemsCantidad,

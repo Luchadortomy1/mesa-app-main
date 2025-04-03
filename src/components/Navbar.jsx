@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import Cookies from 'js-cookie'
+import '../index.css'
+import '../App.css'
 
 const Navbar = () => {
   return (

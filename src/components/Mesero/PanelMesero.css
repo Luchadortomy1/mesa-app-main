@@ -127,7 +127,7 @@ body {
 }
 .mesas-container {
   position: relative;
-  padding: 20px;
+  padding: -20px;
 }
 
 /* Sección para las mesas/órdenes */
