@@ -1,4 +1,4 @@
-.navbar {
+.navbar-mesero {
     background: url('https://www.transparenttextures.com/patterns/dark-wood.png'); /* Textura elegante */
     padding: 15px;
     display: flex;
@@ -16,7 +16,7 @@
     backdrop-filter: blur(5px);
   }
   
-  .navbar-link {
+  .navbar-link-mesero {
     color: #ffcc00;
     font-size: 18px;
     font-weight: bold;
@@ -26,7 +26,7 @@
     border-radius: 10px;
   }
   
-  .navbar-link:hover {
+  .navbar-link-mesero:hover {
     background: rgba(255, 204, 0, 0.3);
     color: #fff;
     transform: scale(1.1);
