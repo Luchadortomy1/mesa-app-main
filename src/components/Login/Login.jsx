@@ -43,6 +43,8 @@ const Login = ({ onLogin }) => {
           navigate('/cocinero');
         } else if (userData.role === 'admin') {
           navigate('/admin');
+          Cookies.set('rol', 'admin'); // o 'mesero', 'cocinero'
+
         }
       } else {
         setError('Usuario, contraseña o rol incorrectos');
