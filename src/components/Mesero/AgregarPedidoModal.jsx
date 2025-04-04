@@ -1,7 +1,7 @@
 // src/components/Mesero/AgregarPedidoModal.jsx
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import app from '../../firebaseConfig'; // Importa tu configuración actual
+import app from '../../Firebaseconfig'; // Importa tu configuración actual
 import './AgregarPedidoModal.css';
 
 const AgregarPedidoModal = ({ isOpen, onClose, onSubmit }) => {

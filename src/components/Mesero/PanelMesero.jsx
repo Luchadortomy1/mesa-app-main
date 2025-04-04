@@ -11,7 +11,7 @@ import {
   updateDoc, 
   doc 
 } from 'firebase/firestore';
-import app from '../../firebaseConfig';
+import app from '../../Firebaseconfig';
 
 const PanelMesero = () => {
   const db = getFirestore(app);
@@ -30,7 +30,8 @@ const PanelMesero = () => {
   useEffect(() => {
     const cargarMenu = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'platillos'));
+        const q = query(collection(db, 'platillos'), where('activo', '==', true));
+        const querySnapshot = await getDocs(q);
         const items = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
@@ -45,6 +46,7 @@ const PanelMesero = () => {
     };
     cargarMenu();
   }, [db]);
+  
 
   // Cargar mesas activas desde Firestore
   useEffect(() => {
