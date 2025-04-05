@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import app from '../../Firebaseconfig'; // Importa tu configuración actual
+import app from '../../Firebaseconfig'; 
 import './AgregarPedidoModal.css';
 
 const AgregarPedidoModal = ({ isOpen, onClose, onSubmit }) => {
@@ -81,7 +81,6 @@ const AgregarPedidoModal = ({ isOpen, onClose, onSubmit }) => {
     }
     
     try {
-      // Agrega el pedido a Firestore
       await addDoc(collection(db, 'pedidos'), {
         ...pedido,
         fecha: new Date(),
@@ -99,7 +98,6 @@ const AgregarPedidoModal = ({ isOpen, onClose, onSubmit }) => {
 
   if (!isOpen) return null;
 
-  // Agrupar ítems por categoría
   const itemsPorCategoria = menuItems.reduce((acc, item) => {
     const categoria = item.categoria || 'Otros';
     if (!acc[categoria]) acc[categoria] = [];

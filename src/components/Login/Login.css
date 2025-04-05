@@ -1,4 +1,3 @@
-/* Reset básico */
 * {
   margin: 0;
   padding: 0;
@@ -8,13 +7,13 @@
 html, body {
   height: 100%;
   width: 100%;
-  overflow: hidden; /* Evita scroll no deseado */
+  overflow: hidden; 
   font-family: 'Arial', sans-serif;
 }
 
 .login-wrapper {
   display: flex;
-  position: fixed; /* Hace que el contenedor sea estático */
+  position: fixed; 
   top: 0;
   left: 0;
   width: 100vw;
@@ -35,7 +34,7 @@ html, body {
   background-image: url('src/assets/94908887838ee9a32701a95a3fd7a4ce_hamburguesa-rellena-de-queso-y-tocineta-recetas-nestle-venezuela-ma.webp');
   background-size: cover;
   background-position: center;
-  display: none; /* Oculto por defecto en pantallas pequeñas */
+  display: none; 
   width: 40%;
   height: 100%;
 }
@@ -47,10 +46,10 @@ html, body {
   align-items: center;
   padding: 2rem;
   background-color: #f5f5f5;
-  max-width: 600px; /* Aumentado el ancho */
+  max-width: 600px; 
   max-height: 600px;
   width: 100%;
-  height: 70%; /* Ajustado el tamaño */
+  height: 70%; 
   overflow-y: auto;
 }
 
@@ -73,7 +72,7 @@ html, body {
 
 .login-form {
   width: 100%;
-  max-width: 500px; /* Ajustado el ancho */
+  max-width: 500px; 
   margin: 0 auto;
 }
 
@@ -92,7 +91,7 @@ html, body {
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: 0.9rem; /* Un poco más grande */
+  padding: 0.9rem;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 1.1rem;
@@ -121,7 +120,6 @@ html, body {
   background-color: #3a7bc8;
 }
 
-/* Estilos para pantallas grandes */
 @media (min-width: 768px) {
   .login-image {
     display: block;
@@ -129,11 +127,10 @@ html, body {
   
   .login-content {
     padding: 3rem;
-    max-width: 600px; /* Aumento del ancho */
+    max-width: 600px; 
   }
 }
 
-/* Estilos específicos para tablets */
 @media (min-width: 768px) and (max-width: 1024px) {
   .login-content {
     justify-content: flex-start;
