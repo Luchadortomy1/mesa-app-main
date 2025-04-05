@@ -68,10 +68,16 @@ const PanelMesero = () => {
   }, [db]);
 
   const agregarMesa = () => {
+    const mesasActivas = mesas.filter(m => m.estado === 'activa');
+    if (mesasActivas.length >= 7) {
+      alert('Ya no hay mesas disponibles. El máximo es 7.');
+      return;
+    }
     setMesaSeleccionada(null);
     setShowModal(true);
     setPedidoActual({});
   };
+  
 
   const calcularTotal = (pedidos) => {
     return pedidos.reduce((total, item) => total + (item.precio * item.cantidad), 0);
