@@ -226,7 +226,7 @@ const PanelMesero = () => {
 
       <div className="dashboard">
         <div className="stats-bar">
-          <div className="stat-card">
+          <div className="stat-item">
             <h4>Mesas Activas</h4>
             <p>{mesas.length}</p>
           </div>
