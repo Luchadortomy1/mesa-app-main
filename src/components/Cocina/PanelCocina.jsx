@@ -170,6 +170,12 @@ const PanelCocina = ({ usuario }) => {
                 Marcar como Entregado
               </button>
             </div>
+
+            <div>
+              <span>
+                Comentario: {orden.comentario}
+              </span>
+            </div>
           </div>
         ))}
       </div>

@@ -20,7 +20,8 @@ const PanelMesero = () => {
   const [mesaSeleccionada, setMesaSeleccionada] = useState(null);
   const [nuevaMesa, setNuevaMesa] = useState({
     nombreCliente: '',
-    numeroComensales: 1
+    numeroComensales: 1,
+    comentario: ''
   });
   const [pedidoActual, setPedidoActual] = useState({});
   const [menuItems, setMenuItems] = useState([]);
@@ -97,10 +98,11 @@ const PanelMesero = () => {
           nombre: item.nombre || 'Producto sin nombre',
           precio: item.precio || 0,
           cantidad: item.cantidad || 1,
-          estado: 'pendiente'
+          estado: 'pendiente',
         })),
         total: calcularTotal(itemsArray),
         estado: 'pendiente',
+        comentario: mesaData.comentario || nuevaMesa.comentario || '',
         fecha: serverTimestamp()
       };
 
@@ -122,7 +124,8 @@ const PanelMesero = () => {
           pedidos: itemsArray,
           total: calcularTotal(itemsArray),
           estado: 'activa',
-          fechaCreacion: serverTimestamp()
+          fechaCreacion: serverTimestamp(),
+          comentario: nuevaMesa.comentario || ''
         });
       }
 
@@ -252,6 +255,7 @@ const PanelMesero = () => {
                   <p>Cliente: {mesa.cliente}</p>
                   <p>Comensales: {mesa.comensales}</p>
                   <p>Total: ${mesa.total}</p>
+                  <p>Comentario: {mesa.comentario}</p>
                 </div>
                 <div className="mesa-actions">
                   <button 
@@ -301,6 +305,13 @@ const PanelMesero = () => {
                       value={nuevaMesa.numeroComensales}
                       onChange={(e) => setNuevaMesa({ ...nuevaMesa, numeroComensales: parseInt(e.target.value) || 1 })}
                       required
+                    />
+                    <label>Comentario</label>
+                    <input
+                      type="text"
+                      value={nuevaMesa.comentario}
+                      onChange={(e) => setNuevaMesa({ ...nuevaMesa, comentario: e.target.value })}
+                      placeholder="Opcional"
                     />
                   </div>
                 </>
