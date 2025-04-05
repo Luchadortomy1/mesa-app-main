@@ -44,7 +44,6 @@
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
     margin-bottom: 1.5rem;
-    color: #ffffff;
   }
   
   .form-group {
@@ -172,3 +171,4 @@
       width: 100%;
     }
   }
+  

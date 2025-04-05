@@ -16,8 +16,7 @@ export const OrdenesProvider = ({ children }) => {
         estado: "pendiente"
       })),
       tiempo: new Date().toISOString(),
-      estado: "pendiente",
-      comentario: nuevaOrden.comentario || "",
+      estado: "pendiente"
     };
     
     setOrdenes(prevOrdenes => [...prevOrdenes, ordenFormateada]);
