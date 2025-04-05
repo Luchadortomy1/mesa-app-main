@@ -1,11 +1,9 @@
-// src/components/Mesero/AgregarPedidoModal.jsx
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import app from '../../firebaseConfig'; // Importa tu configuración actual
 import './AgregarPedidoModal.css';
 
 const AgregarPedidoModal = ({ isOpen, onClose, onSubmit }) => {
-  // Obtiene la instancia de Firestore usando tu app configurada
   const db = getFirestore(app);
   
   const [menuItems, setMenuItems] = useState([]);
@@ -21,7 +19,6 @@ const AgregarPedidoModal = ({ isOpen, onClose, onSubmit }) => {
 
   const [itemsCantidad, setItemsCantidad] = useState({});
 
-  // Función para cargar los platillos desde Firestore
   const cargarPlatillos = async () => {
     setLoading(true);
     setError(null);
