@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc } from 'firebase/firestore';
-import app from '../../firebaseConfig';
+import app from '../../Firebaseconfig';
 import './PanelCocina.css';
 
 const PanelCocina = ({ usuario }) => {
@@ -169,12 +169,6 @@ const PanelCocina = ({ usuario }) => {
               >
                 Marcar como Entregado
               </button>
-            </div>
-
-            <div>
-              <span>
-                Comentario: {orden.comentario}
-              </span>
             </div>
           </div>
         ))}

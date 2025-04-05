@@ -8,6 +8,7 @@ import {
   serverTimestamp, 
   query, 
   where, 
+  onSnapshot,
   updateDoc, 
   doc 
 } from 'firebase/firestore';
@@ -29,43 +30,42 @@ const PanelMesero = () => {
 
   // Cargar menú desde Firestore
   useEffect(() => {
-    const cargarMenu = async () => {
-      try {
-        const q = query(collection(db, 'platillos'), where('activo', '==', true));
-        const querySnapshot = await getDocs(q);
-        const items = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          categoria: doc.data().categoria || 'Otros'
-        }));
-        setMenuItems(items);
-        setLoadingMenu(false);
-      } catch (error) {
-        console.error("Error al cargar el menú:", error);
-        setLoadingMenu(false);
-      }
-    };
-    cargarMenu();
+    const q = query(collection(db, 'mesas'), where('estado', '==', 'activa'));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const mesasData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setMesas(mesasData);
+    }, (error) => {
+      console.error("Error al escuchar cambios de mesas:", error);
+    });
+  
+    return () => unsubscribe();
   }, [db]);
+  
   
 
   // Cargar mesas activas desde Firestore
   useEffect(() => {
-    const cargarMesas = async () => {
-      try {
-        const q = query(collection(db, 'mesas'), where('estado', '==', 'activa'));
-        const querySnapshot = await getDocs(q);
-        const mesasData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setMesas(mesasData);
-      } catch (error) {
-        console.error("Error al cargar mesas:", error);
-      }
-    };
-    cargarMesas();
+    const q = query(collection(db, 'platillos'), where('activo', '==', true));
+  
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const items = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        categoria: doc.data().categoria || 'Otros'
+      }));
+      setMenuItems(items);
+      setLoadingMenu(false);
+    }, (error) => {
+      console.error("Error al escuchar cambios en el menú:", error);
+      setLoadingMenu(false);
+    });
+  
+    return () => unsubscribe();
   }, [db]);
+  
 
   const agregarMesa = () => {
     setMesaSeleccionada(null);

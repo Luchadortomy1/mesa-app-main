@@ -163,7 +163,7 @@
 .mesa-info p {
   margin: 5px 0;
   font-size: 0.9rem;
-  color: #a39d9d;
+  color: #666;
 }
 
 .mesa-actions {
@@ -300,10 +300,4 @@
 body {
   overflow-y: auto;
   min-height: 100vh;
-}
-
-.form-group {
-  label {
-    color: #e9e9e9;
-  }
 }
