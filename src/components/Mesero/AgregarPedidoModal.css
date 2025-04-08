@@ -1,4 +1,3 @@
-/* src/components/Mesero/AgregarPedidoModal.css */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -147,7 +146,6 @@
     color: white;
   }
   
-  /* Responsive Design */
   @media (max-width: 768px) {
     .agregar-pedido-modal {
       width: 95%;

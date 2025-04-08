@@ -28,7 +28,6 @@ const PanelMesero = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loadingMenu, setLoadingMenu] = useState(true);
 
-  // Cargar menú desde Firestore
   useEffect(() => {
     const q = query(collection(db, 'mesas'), where('estado', '==', 'activa'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -44,9 +43,6 @@ const PanelMesero = () => {
     return () => unsubscribe();
   }, [db]);
   
-  
-
-  // Cargar mesas activas desde Firestore
   useEffect(() => {
     const q = query(collection(db, 'platillos'), where('activo', '==', true));
   
@@ -65,7 +61,6 @@ const PanelMesero = () => {
   
     return () => unsubscribe();
   }, [db]);
-  
 
   const agregarMesa = () => {
     const mesasActivas = mesas.filter(m => m.estado === 'activa');
@@ -77,7 +72,6 @@ const PanelMesero = () => {
     setShowModal(true);
     setPedidoActual({});
   };
-  
 
   const calcularTotal = (pedidos) => {
     return pedidos.reduce((total, item) => total + (item.precio * item.cantidad), 0);
@@ -91,11 +85,9 @@ const PanelMesero = () => {
         throw new Error("No hay items en el pedido");
       }
 
-      // Validar y asegurar datos requeridos
       const numeroMesa = mesaData?.numero || (mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1);
       const nombreCliente = mesaData?.cliente || nuevaMesa.nombreCliente || 'Cliente no especificado';
 
-      // Preparar datos del pedido con valores por defecto
       const pedidoData = {
         numeroMesa: numeroMesa,
         nombreCliente: nombreCliente,
@@ -112,10 +104,8 @@ const PanelMesero = () => {
         fecha: serverTimestamp()
       };
 
-      // Guardar pedido en Firestore
       await addDoc(collection(db, 'pedidos'), pedidoData);
 
-      // Actualizar o crear mesa
       if (mesaSeleccionada) {
         await updateDoc(doc(db, 'mesas', mesaSeleccionada.id), {
           pedidos: [...mesaSeleccionada.pedidos, ...itemsArray],
@@ -162,7 +152,6 @@ const PanelMesero = () => {
       setPedidoActual({});
       setMesaSeleccionada(null);
       
-      // Recargar mesas
       const q = query(collection(db, 'mesas'), where('estado', '==', 'activa'));
       const querySnapshot = await getDocs(q);
       setMesas(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
@@ -216,6 +205,12 @@ const PanelMesero = () => {
       acc[categoria].push(item);
       return acc;
     }, {});
+  };
+
+  const handleOverlayClick = (e) => {
+    if (e.target.classList.contains('modal-overlay')) {
+      setShowModal(false);
+    }
   };
 
   if (loadingMenu) {
@@ -288,8 +283,8 @@ const PanelMesero = () => {
       </div>
 
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay" onClick={handleOverlayClick}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>{mesaSeleccionada ? `Agregar Pedido - Mesa ${mesaSeleccionada.numero}` : 'Nueva Mesa'}</h2>
             <form onSubmit={handleSubmitMesa}>
               {!mesaSeleccionada && (
