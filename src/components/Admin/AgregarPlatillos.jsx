@@ -9,14 +9,13 @@ const PanelAgregarPlatillos = ({ usuario }) => {
     const [platillos, setPlatillos] = useState([]);
     const [nombre, setNombre] = useState("");
     const [precio, setPrecio] = useState("");
-    const [descripcion, setDescripcion] = useState(""); // Campo para descripción
-    const [categoria, setCategoria] = useState(""); // Campo para categoría
+    const [descripcion, setDescripcion] = useState(""); 
+    const [categoria, setCategoria] = useState(""); 
     const [mostrarFormulario, setMostrarFormulario] = useState(false);
     const [modoEditar, setModoEditar] = useState(false);
     const [platilloEditando, setPlatilloEditando] = useState(null);
     const formularioRef = useRef(null);
 
-    // Función para agregar un platillo a la base de datos
     const handleAgregarPlatillo = async () => {
         try {
             const nuevoPlatillo = {
@@ -24,7 +23,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                 precio,
                 descripcion,
                 categoria,
-                activo: true // ✅ Nuevo campo para controlar disponibilidad
+                activo: true 
             };
             const docRef = await addDoc(collection(db, "platillos"), nuevoPlatillo);
             setPlatillos([...platillos, { ...nuevoPlatillo, id: docRef.id }]);
@@ -97,7 +96,6 @@ const PanelAgregarPlatillos = ({ usuario }) => {
     };
     
 
-    // Función para obtener todos los platillos desde la base de datos
     const obtenerPlatillos = async () => {
         try {
             const platillosSnapshot = await getDocs(collection(db, "platillos"));
@@ -108,7 +106,6 @@ const PanelAgregarPlatillos = ({ usuario }) => {
         }
     };
 
-    // Función para desactivar un platillo
     const desactivarPlatillo = async (nombrePlatillo) => {
         try {
             const platillosSnapshot = await getDocs(collection(db, "platillos"));
@@ -171,7 +168,6 @@ const PanelAgregarPlatillos = ({ usuario }) => {
         }
     };
     
-    // Obtener los platillos cuando el componente se monta
     useEffect(() => {
         obtenerPlatillos();
     }, []);
@@ -185,7 +181,6 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                 </button>
             </div>
 
-            {/* Mostrar el formulario de agregar platillo */}
             {mostrarFormulario && (
                 <div className="modal">
                     <form
@@ -244,7 +239,6 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                 </div>
             )}
 
-            {/* Mostrar la lista de platillos */}
             <div className="platillos-lista">
                 <h2>Platillos Disponibles</h2>
                 <ul>
@@ -259,7 +253,6 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                                 <p><strong>Categoria:</strong></p>
                                 <p className="categoria">{platillo.categoria}</p>
                                 
-                                {/* Botón cambia dependiendo de estado */}
                                 {platillo.activo ? (
                                     <button
                                         className="boton-desactivar"
