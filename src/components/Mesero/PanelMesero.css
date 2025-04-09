@@ -55,6 +55,18 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.comentario-pedido{
+  margin-bottom: 4%;
+}
+
+.categoria-menu{
+  margin-bottom: 4%;
+}
+
+.item-cantidad span{
+  margin: 5%;
+}
+
 .stat-item {
   display: flex;
   flex-direction: column;

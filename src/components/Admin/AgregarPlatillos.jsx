@@ -239,51 +239,47 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                 </div>
             )}
 
+            <h2 className="titulo">Platillos Disponibles</h2>
             <div className="platillos-lista">
-                <h2>Platillos Disponibles</h2>
                 <ul>
                     {platillos.length > 0 ? (
                         platillos.map((platillo, index) => (
                             <li key={index}>
                                 <h3>{platillo.nombre}</h3>
-                                <p><strong>Precio:</strong></p>
-                                <p className="precio">{platillo.precio}$</p>
+                                <p><strong>Precio:</strong> {platillo.precio}$</p>
                                 <p><strong>Descripción:</strong></p>
                                 <p className="descripcion">{platillo.descripcion}</p>
-                                <p><strong>Categoria:</strong></p>
-                                <p className="categoria">{platillo.categoria}</p>
+                                <p><strong>Categoria:</strong> {platillo.categoria}</p>
                                 
-                                {platillo.activo ? (
-                                    <button
-                                        className="boton-desactivar"
-                                        onClick={() => desactivarPlatillo(platillo.nombre)}
-                                    >
-                                        Desactivar
-                                    </button>
-                                ) : (
-                                    <button
-                                        className="boton-activar"
-                                        onClick={() => activarPlatillo(platillo.nombre)}
-                                    >
-                                        Activar
-                                    </button>
-                                )}
-                                <button
-                                    className="boton-editar"
-                                    onClick={() => abrirFormularioEdicion(platillo)}
-                                >
-                                    Editar
-                                </button>
-
-                            </li>
-                        ))
-                    ) : (
-                        <p>No hay platillos disponibles.</p>
-                    )}
-                </ul>
-            </div>
-        </div>
-    );
-};
-
-export default PanelAgregarPlatillos;
+                                <div className="botones-acciones">
+                                     {platillo.activo ? (
+                                         <button
+                                             className="boton-desactivar"
+                                             onClick={() => desactivarPlatillo(platillo.nombre)}
+                                         >
+                                             Desactivar
+                                         </button>
+                                     ) : (
+                                         <button
+                                             className="boton-activar"
+                                             onClick={() => activarPlatillo(platillo.nombre)}
+                                         >
+                                             Activar
+                                         </button>
+                                     )}
+                                     <button
+                                     className="boton-editar"
+                                     onClick={() => abrirFormularioEdicion(platillo)}
+                                 >Editar </button>
+                                 </div>
+                             </li>
+                         ))
+                     ) : (
+                         <p>No hay platillos disponibles.</p>
+                     )}
+                 </ul>
+             </div>
+         </div>
+     );
+ };
+ export default PanelAgregarPlatillos;

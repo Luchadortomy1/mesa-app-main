@@ -25,15 +25,31 @@
     border-radius: 8px;
     outline: none;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .platillo-form input:focus {
+}
+
+.platillo-form input:focus {
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  }
+}
+
+.platillo-form button{
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.platillo-form button:hover{
+    background-color: #218a3a;
+}
+
 
 .titulo {
     text-align: center;
+    margin-top: 3%;
 }
 
 .boton-container {
@@ -47,29 +63,31 @@
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
-    background-color: #007bff;
+    background-color: #28a745;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 5px; 
 }
 
 .boton-agregar:hover {
-    background-color: #0056b3;
+    background-color: #218137;
 }
 
+/* ACTUALIZADO: platillos como tarjetas en cuadrícula */
 .platillos-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 80%;
-    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: clamp(1rem, 2vw, 2rem);
+    max-width: 90%;
+    margin: 20px auto 0;
     background: #383838;
     padding: 20px;
     border-radius: 10px;
-    margin-top: 20px;
 }
 
+
 .platillos-lista ul {
+    display: contents;
     list-style-type: none;
     padding: 0;
     margin: 0;
@@ -77,14 +95,18 @@
 
 .platillos-lista li {
     border: 1px solid #ccc;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 15px;
     border-radius: 5px;
-    background-color: #383838;
+    background-color: #232323;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .platillos-lista li h3 {
-    margin: 0;
+    margin: 0 0 10px;
     font-size: 1.5em;
 }
 
@@ -93,18 +115,33 @@
 }
 
 .platillos-lista li .descripcion {
-    word-wrap: break-word; /* Permite que el texto largo se ajuste dentro del contenedor */
-    overflow-wrap: break-word; /* Asegura que las palabras largas no se salgan */
-    white-space: pre-wrap; /* Permite el salto de línea automático */
-    max-height: 150px; /* Limita la altura máxima de la descripción */
-    overflow-y: auto; /* Agrega desplazamiento si el contenido excede la altura */
-    font-size: 0.9em; /* Reduce el tamaño de la fuente para la descripción */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: 0.9em;
 }
 
 .platillos-lista li .descripcion p {
     margin: 5px 0;
 }
 
+.boton-activar{
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.boton-activar:hover{
+    background-color: #218137;
+}
+
+/* Botones de acción */
 .boton-desactivar {
     background-color: #ff4d4d;
     color: white;
@@ -127,5 +164,24 @@
     border-radius: 6px;
     cursor: pointer;
     margin-top: 10px;
-    margin-left: 10px;
+}
+
+.boton-editar:hover{
+    background-color: #ce9c06;
+}
+
+/* Opcional: agrupar botones */
+.botones-acciones {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: auto;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+    .platillos-lista {
+        grid-template-columns: 1fr;
+    }
 }
