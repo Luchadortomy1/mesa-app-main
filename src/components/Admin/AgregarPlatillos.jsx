@@ -99,7 +99,16 @@ const PanelAgregarPlatillos = ({ usuario }) => {
     const obtenerPlatillos = async () => {
         try {
             const platillosSnapshot = await getDocs(collection(db, "platillos"));
-            const platillosList = platillosSnapshot.docs.map(doc => doc.data());
+            const platillosList = platillosSnapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(platillo =>
+                    platillo.nombre &&
+                    platillo.precio &&
+                    platillo.descripcion &&
+                    platillo.categoria &&
+                    typeof platillo.activo === "boolean"
+                ); // Filtramos solo los documentos con campos esperados
+    
             setPlatillos(platillosList);
         } catch (error) {
             console.error("Error al obtener los platillos: ", error);
