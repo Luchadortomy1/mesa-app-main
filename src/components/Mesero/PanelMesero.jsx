@@ -325,6 +325,10 @@ const PanelMesero = () => {
 
               <div className="menu-section">
                 <h3>Menú</h3>
+                <div className="comentario-pedido">
+                  <label><strong>Comentario del Pedido:</strong></label>
+                  <p>{nuevaMesa.comentario || mesaSeleccionada?.comentario || 'Sin comentario'}</p>
+                </div>
                 {Object.entries(agruparPorCategoria(menuItems)).map(([categoria, items]) => (
                   <div key={categoria} className="categoria-menu">
                     <h4>{categoria}</h4>
@@ -334,6 +338,7 @@ const PanelMesero = () => {
                           <div className="item-info">
                             <span>{item.nombre}</span>
                             <span>${item.precio}</span>
+                            
                           </div>
                           <div className="item-cantidad">
                             <button
