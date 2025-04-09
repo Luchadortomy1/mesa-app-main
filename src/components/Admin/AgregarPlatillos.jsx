@@ -206,6 +206,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
                                 required
+                                className="nombre-input"
                             />
                         </div>
                         <div>
@@ -215,6 +216,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                                 value={precio}
                                 onChange={(e) => setPrecio(e.target.value)}
                                 required
+                                className="precio-input"
                             />
                         </div>
                         <div>
@@ -224,6 +226,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                                 value={descripcion}
                                 onChange={(e) => setDescripcion(e.target.value)}
                                 required
+                                className="descripcion-input"
                             />
                         </div>
                         <div>
@@ -232,7 +235,8 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                                 type="text"
                                 value={categoria}
                                 onChange={(e) => setCategoria(e.target.value)}
-                                required    
+                                required
+                                className="categoria-input"
                             />
                         </div>
                         <button type="submit">Guardar Platillo</button>
