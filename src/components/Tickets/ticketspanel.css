@@ -1,0 +1,62 @@
+.tickets-panel {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .tickets-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .tickets-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .ticket-card {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2em;
+  }
+  
+  .ticket-status {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 0.9em;
+  }
+  
+  .ticket-status.creado {
+    background-color: #f0ad4e;
+    color: white;
+  }
+  
+  .ticket-status.entregado {
+    background-color: #5bc0de;
+    color: white;
+  }
+  
+  .ticket-items {
+    margin: 15px 0;
+  }
+  
+  .ticket-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.9em;
+    color: #555;
+  }
+  
+  .ticket-footer span {
+    display: block;
+  }
+  

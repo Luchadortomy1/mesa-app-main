@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc, setDoc } from 'firebase/firestore';
 import app from '../../Firebaseconfig';
 import './PanelCocina.css';
 
@@ -61,8 +61,22 @@ const PanelCocina = ({ usuario }) => {
         estado: 'entregado',
         fechaEntrega: new Date()
       });
+
+      // Crear el ticket en la colección 'tickets'
+      const orden = ordenes.find(o => o.id === ordenId);
+      if (orden) {
+        const ticketRef = doc(collection(db, 'tickets')); // Crear un nuevo ticket con ID autogenerado
+        await setDoc(ticketRef, {
+          numeroMesa: orden.numeroMesa,
+          nombreCliente: orden.nombreCliente,
+          items: orden.items,
+          total: orden.total,
+          fechaCreacion: new Date(),
+          estado: 'creado'
+        });
+      }
     } catch (error) {
-      console.error("Error al completar orden:", error);
+      console.error("Error al completar orden y crear ticket:", error);
     }
   };
 
