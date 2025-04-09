@@ -10,6 +10,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
     const [nombre, setNombre] = useState("");
     const [precio, setPrecio] = useState("");
     const [descripcion, setDescripcion] = useState(""); // Campo para descripción
+    const [categoria, setCategoria] = useState(""); // Campo para categoría
     const [mostrarFormulario, setMostrarFormulario] = useState(false);
     const [modoEditar, setModoEditar] = useState(false);
     const [platilloEditando, setPlatilloEditando] = useState(null);
@@ -22,6 +23,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                 nombre,
                 precio,
                 descripcion,
+                categoria,
                 activo: true // ✅ Nuevo campo para controlar disponibilidad
             };
             const docRef = await addDoc(collection(db, "platillos"), nuevoPlatillo);
@@ -29,6 +31,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
             setNombre("");
             setPrecio("");
             setDescripcion("");
+            setCategoria("");
             setMostrarFormulario(false);
             console.log("Platillo agregado en Firebase", nuevoPlatillo);
         } catch (error) {
@@ -43,6 +46,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
         setNombre(platillo.nombre);
         setPrecio(platillo.precio);
         setDescripcion(platillo.descripcion);
+        setCategoria(platillo.categoria);
         setTimeout(() => {
             formularioRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 100);
@@ -66,13 +70,14 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                 await updateDoc(platilloRef, {
                     nombre,
                     precio,
-                    descripcion
+                    descripcion,
+                    categoria,
                 });
     
                 setPlatillos((prevPlatillos) =>
                     prevPlatillos.map((p) =>
                         p.nombre === platilloEditando.nombre
-                            ? { ...p, nombre, precio, descripcion }
+                            ? { ...p, nombre, precio, descripcion, categoria }
                             : p
                     )
                 );
@@ -83,6 +88,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                 setNombre("");
                 setPrecio("");
                 setDescripcion("");
+                setCategoria("");
                 console.log("Platillo editado");
             }
         } catch (error) {
@@ -220,6 +226,15 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                                 required
                             />
                         </div>
+                        <div>
+                            <label>Categoria:</label>
+                            <input 
+                                type="text"
+                                value={categoria}
+                                onChange={(e) => setCategoria(e.target.value)}
+                                required    
+                            />
+                        </div>
                         <button type="submit">Guardar Platillo</button>
                     </form>
                 </div>
@@ -233,9 +248,12 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                         platillos.map((platillo, index) => (
                             <li key={index}>
                                 <h3>{platillo.nombre}</h3>
-                                <p>Precio: ${platillo.precio}</p>
+                                <p><strong>Precio:</strong></p>
+                                <p className="precio">{platillo.precio}$</p>
                                 <p><strong>Descripción:</strong></p>
                                 <p className="descripcion">{platillo.descripcion}</p>
+                                <p><strong>Categoria:</strong></p>
+                                <p className="categoria">{platillo.categoria}</p>
                                 
                                 {/* Botón cambia dependiendo de estado */}
                                 {platillo.activo ? (
