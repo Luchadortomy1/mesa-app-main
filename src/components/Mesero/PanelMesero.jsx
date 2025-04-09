@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './PanelMesero.css';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import { 
   getFirestore, 
   collection, 
@@ -198,16 +200,60 @@ const PanelMesero = () => {
   };
 
   const generarCuenta = async (mesa) => {
+    const confirmacion = window.confirm(`¿Estás seguro de que quieres cerrar la cuenta de la Mesa ${mesa.numero}?`);
+    if (!confirmacion) return;
+  
     try {
       await updateDoc(doc(db, 'mesas', mesa.id), {
         estado: 'completada',
         fechaCierre: serverTimestamp()
       });
+  
       setMesas(mesas.map(m => m.id === mesa.id ? { ...m, estado: 'completada' } : m));
+  
+      const docPDF = new jsPDF();
+  
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = `${window.location.origin}/ticket.jpg`; // Usa tu imagen como fondo
+  
+      img.onload = () => {
+        docPDF.addImage(img, 'JPG', 0, 0, 80, 120); // Tamaño proporcional a ticket
+  
+        const fecha = new Date().toLocaleString();
+  
+        docPDF.setFontSize(12);
+        docPDF.text(`Mesa ${mesa.numero}`, 5, 20);
+        docPDF.text(`Fecha: ${fecha}`, 24, 20);
+  
+        docPDF.setFontSize(10);
+        docPDF.text(`Cliente: ${mesa.cliente}`, 5, 30);
+        docPDF.text(`Comensales: ${mesa.comensales}`, 5, 38);
+        docPDF.text(`Comentario: ${mesa.comentario || 'Ninguno'}`, 5, 46);
+  
+        let y = 60;
+        let total = 0;
+        docPDF.text('Pedido:', 5, y - 10);
+        mesa.pedidos.forEach(item => {
+          const linea = `${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toFixed(2)}`;
+          docPDF.text(linea, 5, y);
+          y += 5;
+          total += item.precio * item.cantidad;
+        });
+  
+        docPDF.setFontSize(12);
+        docPDF.text(`Total: $${total.toFixed(2)}`, 5, y + 10);
+  
+        docPDF.save(`Mesa_${mesa.numero}_ticket.pdf`);
+      };
+  
     } catch (error) {
       console.error("Error al generar cuenta:", error);
     }
   };
+  
+  
+
 
   const agruparPorCategoria = (items) => {
     return items.reduce((acc, item) => {
