@@ -185,3 +185,7 @@
         grid-template-columns: 1fr;
     }
 }
+
+.tickets-panel {
+    display: none;
+}
