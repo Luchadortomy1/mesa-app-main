@@ -127,7 +127,7 @@ const PanelCocina = ({ usuario }) => {
                 <h3>Mesa {orden.numeroMesa}</h3>
                 <div className="orden-detalles">
                   <span className="tiempo">{orden.tiempo.toLocaleTimeString()}</span>
-                  <span className="cliente">Cliente: {orden.nombreCliente}</span>
+                  <span className="cliente"> Cliente: {orden.nombreCliente}</span>
                 </div>
               </div>
               <span className={`estado-badge ${orden.estado}`}>
