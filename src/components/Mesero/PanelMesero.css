@@ -265,7 +265,7 @@
 }
 
 .btn-confirmar {
-  background-color: var(--success-color);
+  background-color: #007bdd;
   color: white;
 }
 

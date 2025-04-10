@@ -153,12 +153,26 @@ const PanelMesero = () => {
       alert("Debes agregar al menos un platillo");
       return;
     }
-
+  
+    // Validación para asegurar que no haya más de 20 comensales
+    if (nuevaMesa.numeroComensales > 20) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pueden agregar más de 20 comensales.',
+        icon: 'error',
+        confirmButtonText: 'Aceptar',
+        background: '#1e1e1e', // fondo oscuro
+        color: '#ffffff', // texto blanco
+        confirmButtonColor: '#007bdd', // verde
+      });
+      return;
+    }
+  
     const success = await guardarPedido(mesaSeleccionada || {
       numero: mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1,
       cliente: nuevaMesa.nombreCliente
     });
-
+  
     if (success) {
       setShowModal(false);
       setNuevaMesa({ nombreCliente: '', numeroComensales: 1 });
@@ -171,6 +185,7 @@ const PanelMesero = () => {
       setMesas(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     }
   };
+  
 
   const actualizarCantidad = (itemId, cantidad) => {
     if (cantidad < 0) return;
@@ -211,7 +226,7 @@ const PanelMesero = () => {
       showCancelButton: true,
       confirmButtonText: 'Sí, cerrar',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#28a745', // amarillo dorado
+      confirmButtonColor: '#007bdd', // amarillo dorado
       cancelButtonColor: '#6b7280', // gris neutro
     });
   
