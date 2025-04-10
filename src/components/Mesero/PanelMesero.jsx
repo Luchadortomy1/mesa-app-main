@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './PanelMesero.css';
 import jsPDF from 'jspdf';
+import Swal from 'sweetalert2';
 import 'jspdf-autotable';
 import { 
   getFirestore, 
@@ -200,25 +201,57 @@ const PanelMesero = () => {
   };
 
   const generarCuenta = async (mesa) => {
-    const confirmacion = window.confirm(`¿Estás seguro de que quieres cerrar la cuenta de la Mesa ${mesa.numero}?`);
-    if (!confirmacion) return;
+    const { isConfirmed } = await Swal.fire({
+      title: '¿Cerrar cuenta?',
+      text: 'Esto marcará la mesa como completada.',
+      icon: 'warning',
+      background: '#1e1e1e', // fondo oscuro
+      color: '#ffffff', // texto blanco
+      iconColor: '#ffffff', // color amarillo para el ícono (puede ser #ffc107)
+      showCancelButton: true,
+      confirmButtonText: 'Sí, cerrar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#28a745', // amarillo dorado
+      cancelButtonColor: '#6b7280', // gris neutro
+    });
+  
+    if (!isConfirmed) return;
+  
+    const { value: metodoPago } = await Swal.fire({
+      title: "Método de pago",
+      input: "select",
+      inputOptions: {
+        efectivo: "Efectivo",
+        tarjeta: "Tarjeta"
+      },
+      inputPlaceholder: "Selecciona el método de pago",
+      showCancelButton: true,
+      inputValidator: (value) => {
+        if (!value) {
+          return "Debes seleccionar un método de pago";
+        }
+      }
+    });
+  
+    if (!metodoPago) return;
   
     try {
       await updateDoc(doc(db, 'mesas', mesa.id), {
         estado: 'completada',
-        fechaCierre: serverTimestamp()
+        fechaCierre: serverTimestamp(),
+        metodoPago
       });
   
-      setMesas(mesas.map(m => m.id === mesa.id ? { ...m, estado: 'completada' } : m));
+      setMesas(mesas.map(m => m.id === mesa.id ? { ...m, estado: 'completada', metodoPago } : m));
   
       const docPDF = new jsPDF();
   
       const img = new Image();
       img.crossOrigin = "anonymous";
-      img.src = `${window.location.origin}/ticket.jpg`; // Usa tu imagen como fondo
+      img.src = `${window.location.origin}/ticket.jpg`;
   
       img.onload = () => {
-        docPDF.addImage(img, 'JPG', 0, 0, 80, 120); // Tamaño proporcional a ticket
+        docPDF.addImage(img, 'JPG', 0, 0, 80, 120);
   
         const fecha = new Date().toLocaleString();
   
@@ -231,7 +264,7 @@ const PanelMesero = () => {
         docPDF.text(`Comensales: ${mesa.comensales}`, 5, 38);
         docPDF.text(`Comentario: ${mesa.comentario || 'Ninguno'}`, 5, 46);
   
-        let y = 60;
+        let y = 70;
         let total = 0;
         docPDF.text('Pedido:', 5, y - 10);
         mesa.pedidos.forEach(item => {
@@ -243,18 +276,17 @@ const PanelMesero = () => {
   
         docPDF.setFontSize(12);
         docPDF.text(`Total: $${total.toFixed(2)}`, 5, y + 10);
+        docPDF.text(`Pago: ${metodoPago}`, 5, 54);
   
         docPDF.save(`Mesa_${mesa.numero}_ticket.pdf`);
       };
   
     } catch (error) {
       console.error("Error al generar cuenta:", error);
+      Swal.fire("Error", "Ocurrió un error al generar la cuenta", "error");
     }
   };
   
-  
-
-
   const agruparPorCategoria = (items) => {
     return items.reduce((acc, item) => {
       const categoria = item.categoria || 'Otros';

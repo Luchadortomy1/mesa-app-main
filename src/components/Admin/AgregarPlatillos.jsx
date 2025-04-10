@@ -1,20 +1,41 @@
-import { useState, useEffect , useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 import "./AgregarPlatillos.css";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc } from "firebase/firestore";
 import app from "../../Firebaseconfig.js";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const db = getFirestore(app);
 
-const PanelAgregarPlatillos = ({ usuario }) => {
+const PanelAgregarPlatillos = () => {
+    const navigate = useNavigate();
+
     const [platillos, setPlatillos] = useState([]);
     const [nombre, setNombre] = useState("");
     const [precio, setPrecio] = useState("");
-    const [descripcion, setDescripcion] = useState(""); 
-    const [categoria, setCategoria] = useState(""); 
+    const [descripcion, setDescripcion] = useState("");
+    const [categoria, setCategoria] = useState("");
     const [mostrarFormulario, setMostrarFormulario] = useState(false);
     const [modoEditar, setModoEditar] = useState(false);
     const [platilloEditando, setPlatilloEditando] = useState(null);
     const formularioRef = useRef(null);
+
+    useEffect(() => {
+        const token = Cookies.get("token");
+
+        try {
+            const data = JSON.parse(token);
+            if (data?.role !== "admin") {
+                throw new Error("No autorizado");
+            }
+        } catch (err) {
+            Cookies.remove("token");
+            navigate("/");
+            return;
+        }
+
+        obtenerPlatillos();
+    }, []);
 
     const handleAgregarPlatillo = async () => {
         try {
@@ -23,7 +44,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                 precio,
                 descripcion,
                 categoria,
-                activo: true 
+                activo: true,
             };
             const docRef = await addDoc(collection(db, "platillos"), nuevoPlatillo);
             setPlatillos([...platillos, { ...nuevoPlatillo, id: docRef.id }]);
@@ -49,21 +70,20 @@ const PanelAgregarPlatillos = ({ usuario }) => {
         setTimeout(() => {
             formularioRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 100);
-    
     };
 
     const guardarEdicionPlatillo = async () => {
         try {
             const platillosSnapshot = await getDocs(collection(db, "platillos"));
             let platilloDoc = null;
-    
+
             platillosSnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 if (data.nombre === platilloEditando.nombre) {
                     platilloDoc = docSnap;
                 }
             });
-    
+
             if (platilloDoc) {
                 const platilloRef = doc(db, "platillos", platilloDoc.id);
                 await updateDoc(platilloRef, {
@@ -72,7 +92,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                     descripcion,
                     categoria,
                 });
-    
+
                 setPlatillos((prevPlatillos) =>
                     prevPlatillos.map((p) =>
                         p.nombre === platilloEditando.nombre
@@ -80,7 +100,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                             : p
                     )
                 );
-    
+
                 setModoEditar(false);
                 setMostrarFormulario(false);
                 setPlatilloEditando(null);
@@ -94,7 +114,6 @@ const PanelAgregarPlatillos = ({ usuario }) => {
             console.error("Error al editar platillo:", error);
         }
     };
-    
 
     const obtenerPlatillos = async () => {
         try {
@@ -107,8 +126,8 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                     platillo.descripcion &&
                     platillo.categoria &&
                     typeof platillo.activo === "boolean"
-                ); // Filtramos solo los documentos con campos esperados
-    
+                );
+
             setPlatillos(platillosList);
         } catch (error) {
             console.error("Error al obtener los platillos: ", error);
@@ -119,24 +138,24 @@ const PanelAgregarPlatillos = ({ usuario }) => {
         try {
             const platillosSnapshot = await getDocs(collection(db, "platillos"));
             let platilloEncontrado = null;
-    
+
             platillosSnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 if (data.nombre === nombrePlatillo) {
                     platilloEncontrado = { id: docSnap.id, ...data };
                 }
             });
-    
+
             if (platilloEncontrado) {
                 const platilloRef = doc(db, "platillos", platilloEncontrado.id);
                 await updateDoc(platilloRef, { activo: false });
-    
+
                 setPlatillos((prevPlatillos) =>
                     prevPlatillos.map((p) =>
                         p.nombre === nombrePlatillo ? { ...p, activo: false } : p
                     )
                 );
-    
+
                 console.log(`Platillo "${nombrePlatillo}" desactivado.`);
             } else {
                 console.warn(`No se encontró el platillo: "${nombrePlatillo}".`);
@@ -145,29 +164,29 @@ const PanelAgregarPlatillos = ({ usuario }) => {
             console.error("Error al desactivar platillo:", error);
         }
     };
-    
+
     const activarPlatillo = async (nombrePlatillo) => {
         try {
             const platillosSnapshot = await getDocs(collection(db, "platillos"));
             let platilloEncontrado = null;
-    
+
             platillosSnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 if (data.nombre === nombrePlatillo) {
                     platilloEncontrado = { id: docSnap.id, ...data };
                 }
             });
-    
+
             if (platilloEncontrado) {
                 const platilloRef = doc(db, "platillos", platilloEncontrado.id);
                 await updateDoc(platilloRef, { activo: true });
-    
+
                 setPlatillos((prevPlatillos) =>
                     prevPlatillos.map((p) =>
                         p.nombre === nombrePlatillo ? { ...p, activo: true } : p
                     )
                 );
-    
+
                 console.log(`Platillo "${nombrePlatillo}" activado.`);
             } else {
                 console.warn(`No se encontró el platillo: "${nombrePlatillo}".`);
@@ -176,10 +195,6 @@ const PanelAgregarPlatillos = ({ usuario }) => {
             console.error("Error al activar platillo:", error);
         }
     };
-    
-    useEffect(() => {
-        obtenerPlatillos();
-    }, []);
 
     return (
         <div className={mostrarFormulario ? "blur-background" : ""}>
@@ -201,7 +216,8 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                                 handleAgregarPlatillo();
                             }
                         }}
-                        className="platillo-form" ref={formularioRef}
+                        className="platillo-form"
+                        ref={formularioRef}
                     >
                         <div>
                             <label>Nombre:</label>
@@ -235,7 +251,7 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                         </div>
                         <div>
                             <label>Categoria:</label>
-                            <input 
+                            <input
                                 type="text"
                                 value={categoria}
                                 onChange={(e) => setCategoria(e.target.value)}
@@ -259,36 +275,39 @@ const PanelAgregarPlatillos = ({ usuario }) => {
                                 <p><strong>Descripción:</strong></p>
                                 <p className="descripcion">{platillo.descripcion}</p>
                                 <p><strong>Categoria:</strong> {platillo.categoria}</p>
-                                
+
                                 <div className="botones-acciones">
-                                     {platillo.activo ? (
-                                         <button
-                                             className="boton-desactivar"
-                                             onClick={() => desactivarPlatillo(platillo.nombre)}
-                                         >
-                                             Desactivar
-                                         </button>
-                                     ) : (
-                                         <button
-                                             className="boton-activar"
-                                             onClick={() => activarPlatillo(platillo.nombre)}
-                                         >
-                                             Activar
-                                         </button>
-                                     )}
-                                     <button
-                                     className="boton-editar"
-                                     onClick={() => abrirFormularioEdicion(platillo)}
-                                 >Editar </button>
-                                 </div>
-                             </li>
-                         ))
-                     ) : (
-                         <p>No hay platillos disponibles.</p>
-                     )}
-                 </ul>
-             </div>
-         </div>
-     );
- };
- export default PanelAgregarPlatillos;
+                                    {platillo.activo ? (
+                                        <button
+                                            className="boton-desactivar"
+                                            onClick={() => desactivarPlatillo(platillo.nombre)}
+                                        >
+                                            Desactivar
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="boton-activar"
+                                            onClick={() => activarPlatillo(platillo.nombre)}
+                                        >
+                                            Activar
+                                        </button>
+                                    )}
+                                    <button
+                                        className="boton-editar"
+                                        onClick={() => abrirFormularioEdicion(platillo)}
+                                    >
+                                        Editar
+                                    </button>
+                                </div>
+                            </li>
+                        ))
+                    ) : (
+                        <p>No hay platillos disponibles.</p>
+                    )}
+                </ul>
+            </div>
+        </div>
+    );
+};
+
+export default PanelAgregarPlatillos;
