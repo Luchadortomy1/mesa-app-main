@@ -150,7 +150,14 @@ const PanelMesero = () => {
     e.preventDefault();
     
     if (Object.keys(pedidoActual).length === 0) {
-      alert("Debes agregar al menos un platillo");
+      Swal.fire({
+        title: 'Pedido vacío',
+        text: 'Debes agregar al menos un platillo antes de enviar la orden.',
+        icon: 'error',
+        background: '#1e1e1e',
+        color: '#ffffff',
+        confirmButtonColor: '#007bdd'
+      });
       return;
     }
   

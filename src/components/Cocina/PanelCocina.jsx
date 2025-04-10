@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc, setDoc } from 'firebase/firestore';
 import app from '../../Firebaseconfig';
+import { Navigate } from 'react-router-dom'; // Cambiado de Redirect a Navigate
 import './PanelCocina.css';
 
+
 const PanelCocina = ({ usuario }) => {
+  // Verifica si el usuario es mesero y redirige a la página correspondiente
+  if (usuario?.rol === 'mesero') {
+    return <Navigate to="/mesero" replace />; // Redirige a la página del mesero si no es cocinero
+  }
+
   const db = getFirestore(app);
   const [ordenes, setOrdenes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +72,7 @@ const PanelCocina = ({ usuario }) => {
       // Crear el ticket en la colección 'tickets'
       const orden = ordenes.find(o => o.id === ordenId);
       if (orden) {
-        const ticketRef = doc(collection(db, 'tickets')); // Crear un nuevo ticket con ID autogenerado
+        const ticketRef = doc(collection(db, 'tickets'));
         await setDoc(ticketRef, {
           numeroMesa: orden.numeroMesa,
           nombreCliente: orden.nombreCliente,
