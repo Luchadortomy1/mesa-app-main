@@ -202,7 +202,7 @@ const PanelMesero = () => {
 
   const generarCuenta = async (mesa) => {
     const { isConfirmed } = await Swal.fire({
-      title: '¿Cerrar cuenta de Mesa 1?',
+      title: '¿Cerrar cuenta?',
       text: 'Esto marcará la mesa como completada.',
       icon: 'warning',
       background: '#1e1e1e', // fondo oscuro
