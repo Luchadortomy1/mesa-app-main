@@ -17,7 +17,7 @@
   }
   
   .navbar-link {
-    color: #ffcc00;
+    color: #007bdd;
     font-size: 18px;
     font-weight: bold;
     text-decoration: none;
@@ -27,7 +27,7 @@
   }
   
   .navbar-link:hover {
-    background: rgba(255, 204, 0, 0.3);
+    background: #007add3e;
     color: #fff;
     transform: scale(1.1);
   }

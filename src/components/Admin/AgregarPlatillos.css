@@ -33,7 +33,7 @@
 }
 
 .platillo-form button{
-    background-color: #28a745;
+    background-color: #007bdd;
     color: white;
     border: none;
     padding: 12px 12px;
@@ -43,7 +43,7 @@
 }
 
 .platillo-form button:hover{
-    background-color: #218a3a;
+    background-color: #007add3e;
 }
 
 
@@ -63,17 +63,17 @@
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
-    background-color: #28a745;
+    background-color: #007bdd;
     color: white;
     border: none;
     border-radius: 5px; 
 }
 
 .boton-agregar:hover {
-    background-color: #218137;
+    background-color: #007add3e;
 }
 
-/* ACTUALIZADO: platillos como tarjetas en cuadrícula */
+
 .platillos-lista {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -128,7 +128,7 @@
 }
 
 .boton-activar{
-    background-color: #28a745;
+    background-color: #007bdd;
     color: white;
     border: none;
     padding: 8px 12px;
@@ -138,10 +138,9 @@
 }
 
 .boton-activar:hover{
-    background-color: #218137;
+    background-color: #007add4b;
 }
 
-/* Botones de acción */
 .boton-desactivar {
     background-color: #ff4d4d;
     color: white;
@@ -170,7 +169,6 @@
     background-color: #ce9c06;
 }
 
-/* Opcional: agrupar botones */
 .botones-acciones {
     display: flex;
     justify-content: flex-start;
@@ -179,9 +177,12 @@
     margin-top: auto;
 }
 
-/* Responsive para pantallas pequeñas */
 @media (max-width: 768px) {
     .platillos-lista {
         grid-template-columns: 1fr;
     }
+}
+
+.tickets-panel {
+    display: none;
 }
