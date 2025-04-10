@@ -111,7 +111,7 @@ const PanelCocina = ({ usuario }) => {
           <h2>Panel de Cocina</h2>
           <div className="usuario-info">
             <span className="chef-icon">👨‍🍳</span>
-            <span className="chef-name">Chef: {usuario}</span>
+            <span className="chef-name">Chef {}</span>
           </div>
         </div>
         <div className="dashboard-stats">
