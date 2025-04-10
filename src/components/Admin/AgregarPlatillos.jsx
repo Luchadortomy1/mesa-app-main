@@ -30,7 +30,7 @@ const PanelAgregarPlatillos = () => {
             }
         } catch (err) {
             Cookies.remove("token");
-            navigate("/login");
+            navigate("/");
             return;
         }
 
