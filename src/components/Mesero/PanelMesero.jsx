@@ -55,7 +55,6 @@ const PanelMesero = ({usuario}) => {
     return <Navigate to="/" replace />;
   }
   
-
   // Cargar mesas activas desde Firestore
   useEffect(() => {
     const q = query(collection(db, 'platillos'), where('activo', '==', true));
@@ -80,7 +79,14 @@ const PanelMesero = ({usuario}) => {
   const agregarMesa = () => {
     const mesasActivas = mesas.filter(m => m.estado === 'activa');
     if (mesasActivas.length >= 7) {
-      alert('Ya no hay mesas disponibles. El máximo es 7.');
+      Swal.fire({
+        title: 'Mesas llenas',
+        text: 'Ya no hay mesas disponibles. El máximo es 7.',
+        icon: 'warning',
+        confirmButtonColor: '#007bdd',
+        background: '#1e1e1e',
+        color: '#ffffff'
+      });
       return;
     }
     setMesaSeleccionada(null);
@@ -101,11 +107,9 @@ const PanelMesero = ({usuario}) => {
         throw new Error("No hay items en el pedido");
       }
 
-      // Validar y asegurar datos requeridos
       const numeroMesa = mesaData?.numero || (mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1);
       const nombreCliente = mesaData?.cliente || nuevaMesa.nombreCliente || 'Cliente no especificado';
 
-      // Preparar datos del pedido con valores por defecto
       const pedidoData = {
         numeroMesa: numeroMesa,
         nombreCliente: nombreCliente,
@@ -122,10 +126,8 @@ const PanelMesero = ({usuario}) => {
         fecha: serverTimestamp()
       };
 
-      // Guardar pedido en Firestore
       await addDoc(collection(db, 'pedidos'), pedidoData);
 
-      // Actualizar o crear mesa
       if (mesaSeleccionada) {
         await updateDoc(doc(db, 'mesas', mesaSeleccionada.id), {
           pedidos: [...mesaSeleccionada.pedidos, ...itemsArray],
@@ -148,7 +150,14 @@ const PanelMesero = ({usuario}) => {
       return true;
     } catch (error) {
       console.error("Error al guardar pedido:", error);
-      alert(`Error al guardar: ${error.message}`);
+      Swal.fire({
+        title: 'Error',
+        text: `Error al guardar: ${error.message}`,
+        icon: 'error',
+        background: '#1e1e1e',
+        color: '#ffffff',
+        confirmButtonColor: '#007bdd'
+      });
       return false;
     }
   };
@@ -168,16 +177,15 @@ const PanelMesero = ({usuario}) => {
       return;
     }
   
-    // Validación para asegurar que no haya más de 20 comensales
     if (nuevaMesa.numeroComensales > 20) {
       Swal.fire({
         title: 'Error',
         text: 'No se pueden agregar más de 20 comensales.',
         icon: 'error',
         confirmButtonText: 'Aceptar',
-        background: '#1e1e1e', // fondo oscuro
-        color: '#ffffff', // texto blanco
-        confirmButtonColor: '#007bdd', // verde
+        background: '#1e1e1e',
+        color: '#ffffff',
+        confirmButtonColor: '#007bdd',
       });
       return;
     }
@@ -193,7 +201,15 @@ const PanelMesero = ({usuario}) => {
       setPedidoActual({});
       setMesaSeleccionada(null);
       
-      // Recargar mesas
+      Swal.fire({
+        title: 'Éxito',
+        text: mesaSeleccionada ? 'Pedido agregado correctamente' : 'Mesa creada correctamente',
+        icon: 'success',
+        background: '#1e1e1e',
+        color: '#ffffff',
+        confirmButtonColor: '#007bdd'
+      });
+
       const q = query(collection(db, 'mesas'), where('estado', '==', 'activa'));
       const querySnapshot = await getDocs(q);
       setMesas(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
@@ -234,14 +250,13 @@ const PanelMesero = ({usuario}) => {
       title: '¿Cerrar cuenta?',
       text: 'Esto marcará la mesa como completada.',
       icon: 'warning',
-      background: '#1e1e1e', // fondo oscuro
-      color: '#ffffff', // texto blanco
-      iconColor: '#ffffff', // color amarillo para el ícono (puede ser #ffc107)
+      background: '#1e1e1e',
+      color: '#ffffff',
       showCancelButton: true,
       confirmButtonText: 'Sí, cerrar',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#007bdd', // amarillo dorado
-      cancelButtonColor: '#6b7280', // gris neutro
+      confirmButtonColor: '#007bdd',
+      cancelButtonColor: '#6b7280',
     });
   
     if (!isConfirmed) return;
@@ -251,18 +266,39 @@ const PanelMesero = ({usuario}) => {
       input: "select",
       inputOptions: {
         efectivo: "Efectivo",
-        tarjeta: "Tarjeta"
+        tarjeta: "Tarjeta",
+        transferencia: "Transferencia"
       },
       inputPlaceholder: "Selecciona el método de pago",
       showCancelButton: true,
+      background: '#1e1e1e',
+      color: '#ffffff',
       inputValidator: (value) => {
-        if (!value) {
-          return "Debes seleccionar un método de pago";
-        }
+        if (!value) return "Debes seleccionar un método de pago";
       }
     });
   
     if (!metodoPago) return;
+  
+    const { value: accion } = await Swal.fire({
+      title: "Nota de venta",
+      text: "¿Cómo deseas generar la nota de venta?",
+      input: "select",
+      inputOptions: {
+        imprimir: "Imprimir nota",
+        mostrar: "Mostrar en pantalla",
+        ambas: "Ambas opciones"
+      },
+      inputPlaceholder: "Selecciona una opción",
+      showCancelButton: true,
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Continuar",
+      confirmButtonColor: '#007bdd',
+      background: '#1e1e1e',
+      color: '#ffffff'
+    });
+  
+    if (!accion) return;
   
     try {
       await updateDoc(doc(db, 'mesas', mesa.id), {
@@ -273,49 +309,155 @@ const PanelMesero = ({usuario}) => {
   
       setMesas(mesas.map(m => m.id === mesa.id ? { ...m, estado: 'completada', metodoPago } : m));
   
-      const docPDF = new jsPDF();
-  
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = `${window.location.origin}/ticket.jpg`;
-  
-      img.onload = () => {
-        docPDF.addImage(img, 'JPG', 0, 0, 80, 120);
-  
-        const fecha = new Date().toLocaleString();
-  
-        docPDF.setFontSize(12);
-        docPDF.text(`Mesa ${mesa.numero}`, 5, 20);
-        docPDF.text(`Fecha: ${fecha}`, 24, 20);
-  
-        docPDF.setFontSize(10);
-        docPDF.text(`Cliente: ${mesa.cliente}`, 5, 30);
-        docPDF.text(`Comensales: ${mesa.comensales}`, 5, 38);
-        docPDF.text(`Comentario: ${mesa.comentario || 'Ninguno'}`, 5, 46);
-  
-        let y = 70;
-        let total = 0;
-        docPDF.text('Pedido:', 5, y - 10);
-        mesa.pedidos.forEach(item => {
-          const linea = `${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toFixed(2)}`;
-          docPDF.text(linea, 5, y);
-          y += 5;
-          total += item.precio * item.cantidad;
+      const docPDF = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [80, 200]
+      });
+
+      // Configuración inicial
+      docPDF.setFont('helvetica', 'normal');
+      docPDF.setFontSize(10);
+
+      // Encabezado
+      docPDF.setTextColor(0, 0, 0);
+      docPDF.setFontSize(14);
+      docPDF.text("RESTAURANTE DELICIAS", 40, 10, { align: 'center' });
+      
+      docPDF.setFontSize(10);
+      docPDF.text("Dirección: Av. Principal 123", 40, 16, { align: 'center' });
+      docPDF.text("Tel: 555-123-4567", 40, 20, { align: 'center' });
+      docPDF.text("RFC: ABCD123456XYZ", 40, 24, { align: 'center' });
+
+      // Línea divisoria
+      docPDF.line(5, 28, 75, 28);
+
+      // Datos del ticket
+      docPDF.setFontSize(12);
+      docPDF.text(`TICKET #${Math.floor(Math.random() * 10000)}`, 40, 34, { align: 'center' });
+      
+      const fecha = new Date();
+      docPDF.text(`Fecha: ${fecha.toLocaleDateString()}`, 5, 40);
+      docPDF.text(`Hora: ${fecha.toLocaleTimeString()}`, 5, 45);
+      
+      docPDF.text(`Mesa: ${mesa.numero}`, 5, 50);
+      docPDF.text(`Cliente: ${mesa.cliente}`, 5, 55);
+      docPDF.text(`Comensales: ${mesa.comensales}`, 5, 60);
+      
+      // Línea divisoria
+      docPDF.line(5, 64, 75, 64);
+
+      // Detalle de productos
+      docPDF.setFontSize(10);
+      docPDF.text("CANT DESCRIPCIÓN       IMPORTE", 5, 70);
+      
+      let y = 75;
+      mesa.pedidos.forEach(item => {
+        const descripcion = item.nombre.length > 20 ? item.nombre.substring(0, 17) + '...' : item.nombre;
+        const importe = (item.precio * item.cantidad).toFixed(2);
+        
+        docPDF.text(`${item.cantidad}`, 5, y);
+        docPDF.text(`${descripcion}`, 15, y);
+        docPDF.text(`$${importe}`, 65, y, { align: 'right' });
+        y += 5;
+      });
+
+      // Línea divisoria
+      docPDF.line(5, y, 75, y);
+      y += 5;
+
+      // Totales
+      const subtotal = mesa.pedidos.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+      const iva = subtotal * 0.16;
+      const total = subtotal + iva;
+
+      docPDF.text(`Subtotal: $${subtotal.toFixed(2)}`, 55, y, { align: 'right' });
+      y += 5;
+      docPDF.text(`IVA (16%): $${iva.toFixed(2)}`, 55, y, { align: 'right' });
+      y += 5;
+      docPDF.setFont('helvetica', 'bold');
+      docPDF.text(`TOTAL: $${total.toFixed(2)}`, 55, y, { align: 'right' });
+      y += 5;
+      
+      docPDF.setFont('helvetica', 'normal');
+      docPDF.text(`Método de pago: ${metodoPago.toUpperCase()}`, 5, y);
+      y += 5;
+      
+      if (mesa.comentario) {
+        docPDF.text(`Comentario: ${mesa.comentario}`, 5, y);
+        y += 5;
+      }
+
+      // Pie de página
+      docPDF.line(5, y, 75, y);
+      y += 5;
+      docPDF.setFontSize(8);
+      docPDF.text("¡Gracias por su visita!", 40, y, { align: 'center' });
+      y += 5;
+      docPDF.text("Vuelva pronto", 40, y, { align: 'center' });
+
+      // Mostrar/Imprimir según selección
+      if (accion === 'mostrar' || accion === 'ambas') {
+        const pdfDataUri = docPDF.output('datauristring');
+        Swal.fire({
+          title: 'Nota de venta',
+          html: `<iframe src="${pdfDataUri}" style="width:100%; height:400px; border:none;"></iframe>`,
+          showConfirmButton: true,
+          confirmButtonText: 'Cerrar',
+          width: '80%',
+          background: '#1e1e1e',
+          customClass: {
+            popup: 'pdf-viewer-popup'
+          }
         });
-  
-        docPDF.setFontSize(12);
-        docPDF.text(`Total: $${total.toFixed(2)}`, 5, y + 10);
-        docPDF.text(`Pago: ${metodoPago}`, 5, 54);
-  
-        docPDF.save(`Mesa_${mesa.numero}_ticket.pdf`);
-      };
-  
+      }
+
+      if (accion === 'imprimir' || accion === 'ambas') {
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Nota de venta - Mesa ${mesa.numero}</title>
+              <style>
+                body { margin: 0; padding: 0; }
+                @media print {
+                  @page { size: auto; margin: 0mm; }
+                }
+              </style>
+            </head>
+            <body>
+              <embed 
+                width="100%" 
+                height="100%" 
+                src="${docPDF.output('datauristring')}" 
+                type="application/pdf"
+              />
+              <script>
+                setTimeout(() => {
+                  document.querySelector('embed').addEventListener('load', () => {
+                    window.print();
+                    setTimeout(() => window.close(), 1000);
+                  });
+                }, 500);
+              </script>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+      }
+
     } catch (error) {
       console.error("Error al generar cuenta:", error);
-      Swal.fire("Error", "Ocurrió un error al generar la cuenta", "error");
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al generar la cuenta",
+        icon: "error",
+        background: '#1e1e1e',
+        color: '#ffffff'
+      });
     }
   };
-  
+
   const agruparPorCategoria = (items) => {
     return items.reduce((acc, item) => {
       const categoria = item.categoria || 'Otros';
@@ -332,7 +474,7 @@ const PanelMesero = ({usuario}) => {
   return (
     <div className="panel-mesero">
       <header>
-        <div className="header-conten">
+        <div className="header-content">
           <h2>Agregue su pedido</h2>
         </div>
       </header>
