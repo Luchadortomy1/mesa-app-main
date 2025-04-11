@@ -273,42 +273,69 @@ const PanelMesero = ({usuario}) => {
   
       setMesas(mesas.map(m => m.id === mesa.id ? { ...m, estado: 'completada', metodoPago } : m));
   
-      const docPDF = new jsPDF();
-  
+      const docPDF = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [80, 160], // tipo recibo
+      });
+      
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.src = `${window.location.origin}/ticket.jpg`;
-  
+      
       img.onload = () => {
+        // Imagen de fondo
         docPDF.addImage(img, 'JPG', 0, 0, 80, 120);
-  
+      
         const fecha = new Date().toLocaleString();
-  
-        docPDF.setFontSize(12);
-        docPDF.text(`Mesa ${mesa.numero}`, 5, 20);
-        docPDF.text(`Fecha: ${fecha}`, 24, 20);
-  
+      
+        docPDF.setFont('courier', 'normal');
         docPDF.setFontSize(10);
-        docPDF.text(`Cliente: ${mesa.cliente}`, 5, 30);
-        docPDF.text(`Comensales: ${mesa.comensales}`, 5, 38);
-        docPDF.text(`Comentario: ${mesa.comentario || 'Ninguno'}`, 5, 46);
-  
-        let y = 70;
+      
+        // Estilo de encabezado centrado
+        docPDF.setFontSize(12);
+        docPDF.text(`*** ORIGINAL ***`, 40, 10, { align: 'center' });
+        docPDF.text(`MESA #${mesa.numero}`, 40, 16, { align: 'center' });
+      
+        docPDF.setFontSize(10);
+        docPDF.text('------------------------------', 40, 20, { align: 'center' });
+      
+        // Datos generales
+        docPDF.text(`FECHA: ${fecha}`, 5, 28);
+        docPDF.text(`CLIENTE: ${mesa.cliente || 'General'}`, 5, 34);
+        docPDF.text(`COMENSALES: ${mesa.comensales}`, 5, 40);
+        docPDF.text(`COMENTARIO: ${mesa.comentario || 'Ninguno'}`, 5, 46);
+      
+        docPDF.text('------------------------------', 40, 52, { align: 'center' });
+      
+        // Pedido
+        docPDF.setFontSize(11);
+        docPDF.text('PEDIDO', 40, 58, { align: 'center' });
+      
+        docPDF.setFontSize(10);
+        let y = 64;
         let total = 0;
-        docPDF.text('Pedido:', 5, y - 10);
+      
         mesa.pedidos.forEach(item => {
           const linea = `${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toFixed(2)}`;
           docPDF.text(linea, 5, y);
           y += 5;
           total += item.precio * item.cantidad;
         });
-  
-        docPDF.setFontSize(12);
-        docPDF.text(`Total: $${total.toFixed(2)}`, 5, y + 10);
-        docPDF.text(`Pago: ${metodoPago}`, 5, 54);
-  
+      
+        docPDF.text('------------------------------', 40, y + 2, { align: 'center' });
+      
+        // Totales y pago
+        docPDF.setFontSize(11);
+        docPDF.text(`TOTAL: $${total.toFixed(2)}`, 5, y + 10);
+        docPDF.text(`PAGO: ${metodoPago}`, 5, y + 16);
+      
+        docPDF.text('<<< GRACIAS POR SU VISITA >>>', 40, y + 28, { align: 'center' });
+      
+        // Guardar PDF
         docPDF.save(`Mesa_${mesa.numero}_ticket.pdf`);
       };
+      
   
     } catch (error) {
       console.error("Error al generar cuenta:", error);
