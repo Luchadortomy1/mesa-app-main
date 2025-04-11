@@ -38,7 +38,7 @@ const PanelCocina = ({ usuario }) => {
 
   const data = Cookies.get('token');
   const datauser = JSON.parse(data);
-  if (datauser?.role !== 'cocina') {
+  if (datauser?.role === 'mesero') {
     return <Navigate to="/" replace />;
   }
 
