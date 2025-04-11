@@ -1,63 +1,97 @@
+/* src/components/Mesas/PanelMesero.css */
+:root {
+  --primary-color: #007bff;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --background-color: #f5f5f5;
+  --card-background: #ffffff;
+  --text-color: #333333;
+  --border-radius: 8px;
+  --spacing-unit: 1rem;
+}
+
 .panel-mesero {
-  background-color: #1a1a1a;
-  color: #ffffff;
   min-height: 100vh;
-  padding: 20px;
+  padding: clamp(1rem, 2vw, 2rem);
+  background-color: var(--background-color);
+  overflow-y: auto; /* Permite hacer scroll */
 }
 
-header {
-  background-color: #252525;
-  padding: 15px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.header-content {
+/* Header - Mantenemos el original pero con mejoras */
+.header-conten {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-}
-
-.dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  text-align: center;
+  height: 100px;
+  background-image: url('https://img.freepik.com/vector-gratis/plantilla-menu-horizontal-platos_79603-1236.jpg?w=1800&t=st=1676175381~exp=1676175981~hmac=e252bf62e221740c4134bb5e26bbed41ca155958f8aa5d582d55bcdc0a27028e');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: rgb(255, 255, 255);
+  font-size: 2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 
+    -2px -2px 0 black,  
+    2px -2px 0 black,  
+    -2px 2px 0 black,  
+    2px 2px 0 black;
+  margin-bottom: var(--spacing-unit);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .stats-bar {
   display: flex;
-  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
   margin-bottom: 20px;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.comentario-pedido{
+  margin-bottom: 4%;
+}
+
+.categoria-menu{
+  margin-bottom: 4%;
+}
+
+.item-cantidad span{
+  margin: 5%;
 }
 
 .stat-item {
-  background-color: #252525;
-  padding: 15px;
-  border-radius: 8px;
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .stat-item h4 {
+  font-size: 1.5rem;
   margin: 0;
-  color: #a0a0a0;
-  font-size: 14px;
-}
-
-.stat-item p {
-  margin: 5px 0 0;
-  font-size: 24px;
-  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   color: #ffffff;
 }
 
+.stat-item p {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 5px 0 0;
+  color: #007bdd;
+}
+
 .mesas-container {
-  background-color: #252525;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  padding: 20px 0;
 }
 
 .mesas-grid {
@@ -67,15 +101,43 @@ header {
   margin-top: 20px;
 }
 
-.mesa-card {
-  background-color: #333333;
-  border-radius: 8px;
-  padding: 15px;
-  transition: transform 0.2s;
+/* Botón agregar - Corregido y funcional */
+.btn-agregar {
+  width: 100%;
+  min-height: 238.91px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
-.mesa-card:hover {
-  transform: translateY(-5px);
+.btn-agregar:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-agregar .btn-icon {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* Mesa card - Estilo mejorado */
+.mesa-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: var(--text-color);
 }
 
 .mesa-header {
@@ -87,245 +149,98 @@ header {
 
 .mesa-header h4 {
   margin: 0;
-  color: #ffffff;
+  font-size: 1.2rem;
 }
 
 .estado {
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
   font-weight: bold;
+  text-transform: uppercase;
 }
 
 .estado.activa {
-  background-color: #4CAF50;
+  background-color: var(--success-color);
   color: white;
 }
 
 .estado.completada {
-  background-color: #9E9E9E;
+  background-color: #6c757d;
   color: white;
 }
 
 .mesa-info p {
   margin: 5px 0;
-  font-size: 14px;
-  color: #cccccc;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 .mesa-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-top: 15px;
 }
 
 .btn-menu, .btn-cuenta {
-  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 8px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-menu {
-  background-color: #007bdd;
+  background-color: var(--primary-color);
   color: white;
-}
-
-.btn-menu:hover {
-  background-color: #0069c0;
-}
-
-.btn-menu:disabled {
-  background-color: #555555;
-  cursor: not-allowed;
 }
 
 .btn-cuenta {
-  background-color: #28a745;
-  color: white;
+  background-color: var(--warning-color);
+  color: #000;
 }
 
-.btn-cuenta:hover {
-  background-color: #218838;
+.btn-menu:hover, .btn-cuenta:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
-.btn-cuenta:disabled {
-  background-color: #555555;
+.btn-menu:disabled, .btn-cuenta:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
-.btn-agregar {
-  background-color: #333333;
-  border: 2px dashed #555555;
-  border-radius: 8px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-agregar:hover {
-  border-color: #007bdd;
-  background-color: #3a3a3a;
-}
-
-.btn-icon {
-  font-size: 24px;
-  color: #007bdd;
-}
-
+/* Modal - Estilo mejorado */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
+  overflow-y: auto;
 }
 
 .modal-content {
-  background-color: #252525;
-  padding: 25px;
-  border-radius: 8px;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 20px;
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-}
-
-.modal-content h2 {
-  margin-top: 0;
-  color: #ffffff;
-  border-bottom: 1px solid #444;
-  padding-bottom: 10px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  color: #cccccc;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #555;
-  background-color: #333;
-  color: white;
-}
-
-.menu-section {
-  margin: 20px 0;
-}
-
-.categoria-menu {
-  margin-bottom: 20px;
-}
-
-.categoria-menu h4 {
-  color: #007bdd;
-  border-bottom: 1px solid #444;
-  padding-bottom: 5px;
-  margin-bottom: 10px;
-}
-
-.items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
-}
-
-.menu-item {
-  background-color: #333;
-  padding: 10px;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-}
-
-.item-info {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.item-cantidad {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.item-cantidad button {
-  background-color: #007bdd;
-  color: white;
-  border: none;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.item-cantidad button:hover {
-  background-color: #0069c0;
-}
-
-.item-cantidad span {
-  min-width: 20px;
-  text-align: center;
-}
-
-.resumen-pedido {
-  background-color: #333;
-  padding: 15px;
-  border-radius: 8px;
-  margin-top: 20px;
-}
-
-.resumen-pedido h3 {
-  margin-top: 0;
-  color: #ffffff;
-}
-
-.items-seleccionados {
-  max-height: 150px;
-  overflow-y: auto;
-  margin: 10px 0;
-}
-
-.item-resumen {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-  border-bottom: 1px solid #444;
-}
-
-.total {
-  text-align: right;
-  font-size: 18px;
-  margin-top: 10px;
-  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .modal-actions {
@@ -335,61 +250,64 @@ header {
   margin-top: 20px;
 }
 
+.btn-cancelar, .btn-confirmar {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
 .btn-cancelar {
   background-color: #6c757d;
   color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-cancelar:hover {
-  background-color: #5a6268;
 }
 
 .btn-confirmar {
-  background-color: #28a745;
+  background-color: #007bdd;
   color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
-.btn-confirmar:hover {
-  background-color: #218838;
+/* Responsive */
+@media (max-width: 768px) {
+  .mesas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  .header-conten {
+    height: 80px;
+    font-size: 1.5rem;
+  }
+  
+  .btn-agregar {
+    min-height: 120px;
+  }
 }
 
-.comentario-pedido {
-  background-color: #333;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 15px;
+@media (max-width: 480px) {
+  .mesas-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .header-conten {
+    height: 70px;
+    font-size: 1.2rem;
+  }
+  
+  .stats-bar {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
 }
 
-.comentario-pedido label {
-  font-weight: bold;
-  color: #cccccc;
-}
-
-.comentario-pedido p {
-  margin: 5px 0 0;
-  color: #ffffff;
-}
-
-.pdf-viewer-popup {
-  max-width: 800px !important;
-}
-
-.pdf-viewer-popup .swal2-html-container {
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-}
-
-.pdf-viewer-popup iframe {
-  min-height: 500px;
-  border: 1px solid #444;
-  border-radius: 4px;
+body {
+  overflow-y: auto;
+  min-height: 100vh;
 }
