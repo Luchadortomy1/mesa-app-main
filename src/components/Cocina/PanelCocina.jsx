@@ -3,11 +3,12 @@ import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc, set
 import app from '../../Firebaseconfig';
 import { Navigate } from 'react-router-dom'; // Cambiado de Redirect a Navigate
 import './PanelCocina.css';
+import Cookies from 'js-cookie'; // Asegúrate de tener js-cookie instalado
 
 
 const PanelCocina = ({ usuario }) => {
   // Verifica si el usuario es mesero y redirige a la página correspondiente
-  if (usuario?.rol === 'mesero') {
+  if (usuario?.role === 'mesero') {
     return <Navigate to="/mesero" replace />; // Redirige a la página del mesero si no es cocinero
   }
 
@@ -34,6 +35,12 @@ const PanelCocina = ({ usuario }) => {
 
     return () => unsubscribe();
   }, [db]);
+
+  const data = Cookies.get('token');
+  const datauser = JSON.parse(data);
+  if (datauser?.role !== 'cocina') {
+    return <Navigate to="/" replace />;
+  }
 
   const actualizarEstadoItem = async (ordenId, itemId, nuevoEstado) => {
     try {

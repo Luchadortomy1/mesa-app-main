@@ -16,8 +16,10 @@ import {
   doc 
 } from 'firebase/firestore';
 import app from '../../Firebaseconfig';
+import { Navigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
-const PanelMesero = () => {
+const PanelMesero = ({usuario}) => {
   const db = getFirestore(app);
   const [mesas, setMesas] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -46,7 +48,12 @@ const PanelMesero = () => {
   
     return () => unsubscribe();
   }, [db]);
-  
+
+  const data = Cookies.get('token');
+  const datauser = JSON.parse(data);
+  if (datauser?.role !== 'mesero') {
+    return <Navigate to="/" replace />;
+  }
   
 
   // Cargar mesas activas desde Firestore
